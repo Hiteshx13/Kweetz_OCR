@@ -18,7 +18,7 @@ import com.google.android.gms.vision.text.TextRecognizer;
 import com.tuts.prakash.simpleocr.R;
 
 import java.io.IOException;
-
+//Comment
 public class MainActivity extends AppCompatActivity {
 
     SurfaceView mCameraView;
