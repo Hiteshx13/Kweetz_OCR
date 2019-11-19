@@ -1,0 +1,3 @@
+package com.kweetz.utils
+
+var PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE=101

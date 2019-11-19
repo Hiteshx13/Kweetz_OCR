@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/dp10">
+
+            <LinearLayout
+                android:id="@+id/llAutoFill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp5"
+                android:background="@drawable/shape_border_black"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dp5">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Auto fill-In"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:rotation="125"
+                    android:src="@drawable/ic_attachment_black_24dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Receipt Number"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+
+                <android.support.v7.widget.AppCompatEditText
+                    style="@style/StyleEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="2"
+                    tools:text="123456" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp10"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Receipt Date"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+
+                <android.support.v7.widget.AppCompatEditText
+                    style="@style/StyleEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="2"
+                    android:singleLine="true"
+                    tools:text="15-11-2019" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp10"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Receipt Issuer"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+
+                <android.support.v7.widget.AppCompatEditText
+                    style="@style/StyleEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="2"
+                    android:singleLine="true"
+                    tools:text="Abcd" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp10"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Receipt Total"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+
+                <android.support.v7.widget.AppCompatEditText
+                    style="@style/StyleEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="2"
+                    android:singleLine="true"
+                    tools:text="$22" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp10"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-black"
+                    android:text="@string/receipt_description"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+
+                <android.support.v7.widget.AppCompatEditText
+                    style="@style/StyleEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="2"
+                    android:singleLine="true"
+                    tools:text="Test Description" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="@dimen/dp5"
+                android:layout_marginTop="@dimen/dp40"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/etFullReceipt"
+                    style="@style/StyleEditTextMultiLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/dp5"
+                android:layout_marginBottom="@dimen/dp30"
+                android:background="@drawable/shape_border_black"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dp5"
+                android:paddingStart="@dimen/dp20"
+                android:paddingEnd="@dimen/dp20">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tvSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-black"
+                    android:text="SAVE"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:fontFamily="@font/font_fake_receipt" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

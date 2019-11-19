@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="5"
-    tools:context="com.kweetz.MainActivity">
+    tools:context="com.kweetz.activity.MainActivity">
 
     <SurfaceView
         android:id="@+id/surfaceView"
@@ -25,4 +25,9 @@
         android:textColor="@android:color/black"
         android:textSize="20sp" />
 
+    <Button
+        android:id="@+id/btnGallery"
+        android:text="Gallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

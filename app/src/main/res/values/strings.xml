@@ -2,5 +2,9 @@
     <string name="app_name">Kweetz OCR</string>
     <string name="txt_message">No Text Available</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="receipt_description">Receipt Description</string>
+    <string name="recent">Recent</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
 
 </resources>
