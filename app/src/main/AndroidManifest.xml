@@ -13,6 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <provider
+            android:name=".utils.GenericFileProvider"
+            android:authorities="com.kweetz.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <activity android:name="com.kweetz.activity.MainActivity">
             <!-- <intent-filter>
                  <action android:name="android.intent.action.MAIN" />
@@ -28,7 +39,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.kweetz.activity.AddReceiptActivity">
+        <activity android:name="com.kweetz.activity.AddReceiptActivity"
+            android:windowSoftInputMode="stateAlwaysHidden">
              <!-- <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="StyleEditText">
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:paddingStart">@dimen/dp10</item>
@@ -16,6 +17,7 @@
         <item name="android:paddingBottom">@dimen/dp5</item>
         <item name="android:singleLine">true</item>
     </style>
+
     <style name="StyleEditTextMultiLine">
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:paddingStart">@dimen/dp10</item>
@@ -25,4 +27,9 @@
         <item name="android:paddingBottom">@dimen/dp5</item>
     </style>
 
+    <style name="StyleReceiptText">
+        <item name="android:textSize">@dimen/sp14</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="fontFamily">@font/font_fake_receipt</item>
+    </style>
 </resources>

@@ -6,5 +6,9 @@
     <string name="recent">Recent</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
+    <string name="request_code">request_code</string>
+    <string name="image_uri">image_uri</string>
+    <string name="no_receipts">No receipts found.</string>
+    <string name="grant_all_permission">Please grant all permissions from application settings</string>
 
 </resources>
