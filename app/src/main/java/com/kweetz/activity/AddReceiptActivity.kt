@@ -252,7 +252,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?) : AsyncTaskLoader<ModelAsyncResult>(context) {
         //Create the TextRecognizer
         var pointer = 0
-        lateinit var arrayParent: ArrayList<Array<String>>
+        var arrayParent = ArrayList<ArrayList<String>?>()
+        lateinit var listParent: HashMap<Int, ArrayList<String>?>
         var textRecognizer: TextRecognizer = TextRecognizer.Builder(context).build()
         lateinit var receipt: Receipt
         lateinit var bitmap: Bitmap
@@ -311,17 +312,28 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 frame = Frame.Builder().setBitmap(bitmap).build()
                 val items = textRecognizer.detect(frame)
                 items.valueAt(0).components
-
+                var listLength = items.valueAt(items.size() - 1).boundingBox.top
+                listParent = HashMap(listLength)
                 val stringBuilder = StringBuilder()
                 for (i in 0 until items.size()) {
                     val item = items.valueAt(i)
+                    item.components.size
+                    for (j in item.components) {
+                        var posTop = j.boundingBox.top
+
+                        if (listParent.containsKey(posTop)) {
+                            var array: ArrayList<String> = listParent[posTop] as ArrayList<String>
+                            array.add(j.value)
+                        } else {
+                            var array = ArrayList<String>()
+                            array.add(j.value)
+                            listParent.put(posTop, array)
+                        }
+                    }
+
 
                     stringBuilder.append(item.value)
                     Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
-                    var arrayRow = item.components
-                    if (item.boundingBox.top > pointer) {
-                        pointer = item.boundingBox.top
-                    }
 
                     if (receipt.receiptNo.isEmpty()) {
                         /****set receipt number****/
