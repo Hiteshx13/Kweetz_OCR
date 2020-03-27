@@ -36,6 +36,7 @@ import com.kweetz.database.model.Receipt
 import com.kweetz.databinding.ActivityAddReceiptBinding
 import com.kweetz.listener.listener
 import com.kweetz.model.ModelAsyncResult
+import com.kweetz.model.ModelReceiptData
 import com.kweetz.utils.*
 import java.io.FileNotFoundException
 import java.text.DateFormat
@@ -69,36 +70,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         receipt = intent.getParcelableExtra(RECEIPT) ?: Receipt()
         totalReceipts = roomDB.productsDao().getAllReceipts().size
 
-        /*  //Create the TextRecognizer
-          textRecognizer = TextRecognizer.Builder(applicationContext).build()
-
-          //Set the TextRecognizer's Processor.
-          textRecognizer.setProcessor(object : Detector.Processor<TextBlock> {
-              override fun release() {}
-
-              */
-        /**
-         * Detect all the text from camera using TextBlock and the values into a stringBuilder
-         * which will then be set to the textView.
-         *//*
-            override fun receiveDetections(detections: Detector.Detections<TextBlock>) {
-                val items = detections.detectedItems
-                if (items.size() != 0) {
-
-                    binding.etFullReceipt.post(Runnable {
-
-                        val stringBuilder = StringBuilder()
-                        for (i in 0 until items.size()) {
-                            val item = items.valueAt(i)
-                            stringBuilder.append(item.value)
-                            Log.d("#Detected $i", " = " + item.value)
-                            stringBuilder.append("\n")
-                        }
-                        binding.etFullReceipt.setText(stringBuilder.toString())
-                    })
-                }
-            }
-        })*/
     }
 
 
@@ -250,10 +221,10 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     }
 
     class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?) : AsyncTaskLoader<ModelAsyncResult>(context) {
-        //Create the TextRecognizer
+
         var pointer = 0
         var arrayParent = ArrayList<ArrayList<String>?>()
-        lateinit var listParent: HashMap<Int, ArrayList<String>?>
+        lateinit var listParent: HashMap<Int, ArrayList<ModelReceiptData>?>
         var textRecognizer: TextRecognizer = TextRecognizer.Builder(context).build()
         lateinit var receipt: Receipt
         lateinit var bitmap: Bitmap
@@ -267,7 +238,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             Log.d("#run", "onStartLoading")
         }
 
-        // background work
         override fun loadInBackground(): ModelAsyncResult? {
             receipt = Receipt()
             textRecognizer.setProcessor(object : Detector.Processor<TextBlock> {
@@ -321,16 +291,13 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     for (j in item.components) {
                         var posTop = j.boundingBox.top
 
+                        var array = ArrayList<ModelReceiptData>()
                         if (listParent.containsKey(posTop)) {
-                            var array: ArrayList<String> = listParent[posTop] as ArrayList<String>
-                            array.add(j.value)
-                        } else {
-                            var array = ArrayList<String>()
-                            array.add(j.value)
-                            listParent.put(posTop, array)
+                            array = listParent[posTop] as ArrayList<ModelReceiptData>
                         }
+                        array.add(ModelReceiptData(j.boundingBox.left, j.boundingBox.top, j.boundingBox.right, j.boundingBox.bottom, j.value))
+                        listParent[posTop] = array
                     }
-
 
                     stringBuilder.append(item.value)
                     Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
@@ -383,11 +350,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             paint.color = Color.RED
             paint.style = Paint.Style.STROKE;
             paint.strokeWidth = 4f;
-//ceks- left=825 top=984 right=968 bottom=1057 ,
-//      left=205 top=1041 right=923 bottom=1147
-//      left=1455 top=1121 right=1676 bottom=1216
 
-            //paint.setColor(android.R.color.black);
             paint.textSize = 60f//(item.boundingBox.bottom - item.boundingBox.top).toFloat();
 
             Log.d("#SIZE : " + item.value, "" + (item.boundingBox.bottom - item.boundingBox.top))
