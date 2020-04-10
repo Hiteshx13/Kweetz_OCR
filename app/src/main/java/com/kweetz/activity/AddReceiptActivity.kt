@@ -6,17 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
-import android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
-import android.media.SoundPool
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
-import android.util.SparseArray
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -24,14 +18,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.loader.content.AsyncTaskLoader
-import androidx.loader.content.Loader
-import com.google.android.gms.internal.phenotype.zzh.init
-import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.Frame
-import com.google.android.gms.vision.text.*
+import com.google.android.gms.vision.text.Text
+import com.google.android.gms.vision.text.TextBlock
+import com.google.android.gms.vision.text.TextRecognizer
 import com.kweetz.R
-import com.kweetz.database.AppDatabase
 import com.kweetz.database.model.Receipt
 import com.kweetz.databinding.ActivityAddReceiptBinding
 import com.kweetz.listener.listener
@@ -39,7 +31,6 @@ import com.kweetz.model.ModelAsyncResult
 import com.kweetz.model.ModelReceiptData
 import com.kweetz.utils.*
 import java.io.FileNotFoundException
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 
@@ -49,6 +40,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     var imageUri: Uri? = null
     var totalReceipts = 0
     var receipt = Receipt()
+    var model = ModelAsyncResult( )
 
     companion object {
         fun getIntent(context: Context, receipt: Receipt? = Receipt()): Intent {
@@ -63,7 +55,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_receipt)
         initialization()
         onClickListener()
-        updateUI(receipt)
+        updateUI(model)
     }
 
     fun initialization() {
@@ -78,9 +70,23 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         binding.tvSave.setOnClickListener(this)
     }
 
-    fun updateUI(receipt: Receipt?) {
-        binding.model = receipt
+    fun updateUI(result: ModelAsyncResult?) {
+        binding.model = result?.receipt
         binding.notifyChange()
+        if (result?.bitmap?.width ?: 0 > 0) {
+
+            var halfLength = result!!.bitmap?.width ?: 0 / 2
+            var listParent: HashMap<Int, ArrayList<ModelReceiptData>?>? = result.listParent
+
+            if (!result.listParent.isNullOrEmpty()) {
+
+                for (i in result.listParent!!) {
+                    Log.d("", "")
+
+                }
+            }
+        }
+
     }
 
     override fun onClick(view: View?) {
@@ -210,8 +216,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 Log.d("#run", "over")
                 binding.indeterminateBar.visibility = View.GONE
 
-                binding.rlBackground.background = BitmapDrawable(this.resources, receipt!!.bitmap)
-                updateUI(receipt?.receipt)
+                //binding.rlBackground.background = BitmapDrawable(this.resources, receipt!!.bitmap)
+                updateUI(receipt)
             }
             mLoader.startLoading()
 
@@ -270,21 +276,27 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 arrayParent = ArrayList()
                 val frame: Frame
                 if (reqCode == REQUEST_CODE_CAMERA) {
-                    bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri);
+                    bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
                 } else {
                     val imageStream = context.contentResolver.openInputStream(data!!.data!!)
                     bitmap = BitmapFactory.decodeStream(imageStream)
                 }
 
-                bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888);
-                bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888);
+                bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+                bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
                 frame = Frame.Builder().setBitmap(bitmap).build()
                 val items = textRecognizer.detect(frame)
+
+
+
                 items.valueAt(0).components
                 var listLength = items.valueAt(items.size() - 1).boundingBox.top
                 listParent = HashMap(listLength)
                 val stringBuilder = StringBuilder()
+
+                var half = bitmap.width / 2
+
                 for (i in 0 until items.size()) {
                     val item = items.valueAt(i)
                     item.components.size
@@ -295,8 +307,13 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         if (listParent.containsKey(posTop)) {
                             array = listParent[posTop] as ArrayList<ModelReceiptData>
                         }
-                        array.add(ModelReceiptData(j.boundingBox.left, j.boundingBox.top, j.boundingBox.right, j.boundingBox.bottom, j.value))
+                        var t_left = j.boundingBox.left
+                        var t_top = j.boundingBox.top
+                        var t_right = j.boundingBox.right
+                        var t_bottom = j.boundingBox.bottom
+                        array.add(ModelReceiptData(t_left, t_top, t_right, t_bottom, j.value))
                         listParent[posTop] = array
+                        Log.d("HEIGHT__", "" + (t_bottom - t_top) + "__" + j.value.replace("/n", ""))
                     }
 
                     stringBuilder.append(item.value)
@@ -309,8 +326,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     if (isReceiptTotal(item.value)) {
                         /****set receipt total****/
 
-                        var strPrevious: String? = items.valueAt(i - 1).value.trim() ?: ""
-                        var strNext: String? = items.valueAt(i + 1).value.trim() ?: ""
+                        var strPrevious: String? = items.valueAt(i - 1).value.trim()
+                        var strNext: String? = items.valueAt(i + 1).value.trim()
 
                         if (isStrNumber(strPrevious)) {
                             if (isStrNumber(strNext)) {
@@ -343,13 +360,13 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 Log.d("###", "Something went wrong")
             }
             Log.d("#run", "stop")
-            return ModelAsyncResult(bitmapOverlay, receipt)
+            return ModelAsyncResult(bitmapOverlay, receipt, listParent)
         }
 
         fun createBoundingBox(item: Text) {
             paint.color = Color.RED
-            paint.style = Paint.Style.STROKE;
-            paint.strokeWidth = 4f;
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 4f
 
             paint.textSize = 60f//(item.boundingBox.bottom - item.boundingBox.top).toFloat();
 
@@ -358,7 +375,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             var canvasOverlay = Canvas(bitmapOverlay)
 
             canvas.drawRect(item.boundingBox, paint)
-            canvas.drawText(item.value, item.boundingBox.left.toFloat(), item.boundingBox.top.toFloat(), paint);
+            canvas.drawText(item.value, item.boundingBox.left.toFloat(), item.boundingBox.top.toFloat(), paint)
             canvasOverlay.drawBitmap(bitmapTemp, Matrix(), null)
         }
 
