@@ -40,7 +40,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     var imageUri: Uri? = null
     var totalReceipts = 0
     var receipt = Receipt()
-    var model = ModelAsyncResult( )
+    var model = ModelAsyncResult()
 
     companion object {
         fun getIntent(context: Context, receipt: Receipt? = Receipt()): Intent {
@@ -71,21 +71,74 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     }
 
     fun updateUI(result: ModelAsyncResult?) {
+
+        var listTemp = HashMap<Int, ArrayList<ModelReceiptData>?>()
         binding.model = result?.receipt
         binding.notifyChange()
         if (result?.bitmap?.width ?: 0 > 0) {
 
-            var halfLength = result!!.bitmap?.width ?: 0 / 2
-            var listParent: HashMap<Int, ArrayList<ModelReceiptData>?>? = result.listParent
+            var halfLength = (result!!.bitmap?.width ?: 0) / 2
 
             if (!result.listParent.isNullOrEmpty()) {
-
                 for (i in result.listParent!!) {
-                    Log.d("", "")
+                    var data: ModelReceiptData = i.value!![0]
+                    if (data.left > halfLength) {
 
+                        var array = ArrayList<ModelReceiptData>()
+
+                        var height: Int = (data.bottom - data.top)
+                        var min = data.top - (height / 2)
+                        var max = data.top + (height / 2)
+
+                        var isNew = true
+                        for (j in min..max) {
+                            if (result.listParent!!.containsKey(j) && j != data.top) {
+                                array = result.listParent!![j] as ArrayList<ModelReceiptData>
+                                if (isAlphaNumerical(array[0].text)) {
+                                    array.add(data)
+                                    listTemp[j] = array
+                                    Log.d("#Found__" + j, "__" + data.top)
+                                    isNew = false
+                                    break
+                                }
+                            }
+                        }
+                        if (isNew) {
+                            array.add(data)
+                            listTemp[i.key] = array
+                        }
+                    } else {
+                        listTemp[i.key] = i.value
+                    }
                 }
             }
         }
+
+
+        var listOpt = HashMap<Int, ArrayList<ModelReceiptData>?>()
+        for (i in listTemp) {
+            if (i.value?.size ?: 0 > 1) {
+                listOpt[i.key] = i.value
+            }
+        }
+
+        for(i in listOpt){
+            var array=i.value as ArrayList<ModelReceiptData>
+            for(j in 0 until  array.size){
+                if(isReceiptTotal(array[j].text)){
+
+                    var receipt=result?.receipt
+                    receipt?.receiptTotal=array[j+1].text.toString()
+                    binding.model =receipt
+                    binding.notifyChange()
+                }
+            }
+        }
+    }
+
+
+    fun postProcess(list: HashMap<Int, ArrayList<ModelReceiptData>?>) {
+
 
     }
 
@@ -402,37 +455,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         }
 
 
-        fun isReceiptTotal(str: String): Boolean {
-            var arry = arrayOf("Samaksai EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
-            var isTotal = false
-            arry.forEach {
-                if (str.toLowerCase().contains(it.toString().toLowerCase())) {
-                    isTotal = true
-                }
-            }
-            return isTotal
-        }
 
 
-        fun isReceiptDate(strDate: String): Boolean {
-            var isDate = false
-            var dateFormat1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            var dateFormat2 = SimpleDateFormat("yyyy-MM-dd")
 
-            try {
-                var date = dateFormat1.parse(strDate)
-                isDate = true
-            } catch (e: Exception) {
-                Log.d("ParseException", "" + e.message)
-            }
-
-            try {
-                var date = dateFormat2.parse(strDate)
-                isDate = true
-            } catch (e: Exception) {
-                Log.d("ParseException", "" + e.message)
-            }
-            return isDate
-        }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.text.format.DateFormat
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -12,6 +13,7 @@ import com.kweetz.R
 import java.io.File
 import java.io.IOException
 import java.lang.NumberFormatException
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -75,6 +77,36 @@ fun isAlphaNumerical(str: String?): Boolean {
     return str!=null&& str.matches(Regex( ".*[a-zA-Z1-9\\n].*"))
 }
 
+fun isReceiptTotal(str: String): Boolean {
+    var arry = arrayOf("Samaksai EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
+    var isTotal = false
+    arry.forEach {
+        if (str.toLowerCase().contains(it.toString().toLowerCase())) {
+            isTotal = true
+        }
+    }
+    return isTotal
+}
+fun isReceiptDate(strDate: String): Boolean {
+    var isDate = false
+    var dateFormat1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    var dateFormat2 = SimpleDateFormat("yyyy-MM-dd")
+
+    try {
+        var date = dateFormat1.parse(strDate)
+        isDate = true
+    } catch (e: Exception) {
+        Log.d("ParseException", "" + e.message)
+    }
+
+    try {
+        var date = dateFormat2.parse(strDate)
+        isDate = true
+    } catch (e: Exception) {
+        Log.d("ParseException", "" + e.message)
+    }
+    return isDate
+}
 fun strToNumber(str: String?): Number? {
 
     var num: Number? = null
