@@ -347,6 +347,17 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     bitmap = BitmapFactory.decodeStream(imageStream)
                 }
                 bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+
+                if(bitmap.width>bitmap.height){
+                    var matrix =  Matrix();
+                    matrix.postRotate(90f);
+
+                    var scalled= Bitmap.createScaledBitmap(bitmap,  bitmap.width, bitmap.height, true);
+                    bitmap= Bitmap.createBitmap(scalled, 0, 0, scalled.getWidth(), scalled.getHeight(), matrix, true);
+                }
+
+
+
                 bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
                 frame = Frame.Builder().setBitmap(bitmap).build()
