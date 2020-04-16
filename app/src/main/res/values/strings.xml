@@ -10,5 +10,9 @@
     <string name="image_uri">image_uri</string>
     <string name="no_receipts">No receipts found.</string>
     <string name="grant_all_permission">Please grant all permissions from application settings</string>
+    <string name="receipt_number">Receipt Number</string>
+    <string name="receipt_date">Receipt Date</string>
+    <string name="receipt_issuer">Receipt Issuer</string>
+    <string name="receipt_total">Receipt Total</string>
 
 </resources>

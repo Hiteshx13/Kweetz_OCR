@@ -2,6 +2,7 @@ package com.kweetz.utils
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.*
 import android.net.Uri
 import android.os.Environment
 import android.text.format.DateFormat
@@ -12,7 +13,6 @@ import androidx.core.content.FileProvider
 import com.kweetz.R
 import java.io.File
 import java.io.IOException
-import java.lang.NumberFormatException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -78,7 +78,7 @@ fun isAlphaNumerical(str: String?): Boolean {
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("Samaksai EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
+    var arry = arrayOf("Samaksai EUR","Sanaksai EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
     var isTotal = false
     arry.forEach {
         if (str.toLowerCase().contains(it.toString().toLowerCase())) {
@@ -106,6 +106,22 @@ fun isReceiptDate(strDate: String): Boolean {
         Log.d("ParseException", "" + e.message)
     }
     return isDate
+}
+
+fun toGrayscale(bmpOriginal: Bitmap): Bitmap? {
+    val width: Int
+    val height: Int
+    height = bmpOriginal.height
+    width = bmpOriginal.width
+    val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val c = Canvas(bmpGrayscale)
+    val paint = Paint()
+    val cm = ColorMatrix()
+    cm.setSaturation(0f)
+    val f = ColorMatrixColorFilter(cm)
+    paint.colorFilter = f
+    c.drawBitmap(bmpOriginal, 0f, 0f, paint)
+    return bmpGrayscale
 }
 fun strToNumber(str: String?): Number? {
 

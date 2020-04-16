@@ -31,7 +31,6 @@ import com.kweetz.model.ModelAsyncResult
 import com.kweetz.model.ModelReceiptData
 import com.kweetz.utils.*
 import java.io.FileNotFoundException
-import java.text.SimpleDateFormat
 
 
 class AddReceiptActivity : BaseActivity(), View.OnClickListener {
@@ -55,7 +54,12 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_receipt)
         initialization()
         onClickListener()
-        updateUI(model)
+
+        if (intent != null && intent.hasExtra(RECEIPT)) {
+            var data = ModelAsyncResult(null, intent!!.getParcelableExtra(RECEIPT) as Receipt, null)
+            updateUI(data)
+        }
+
     }
 
     fun initialization() {
@@ -82,13 +86,16 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             if (!result.listParent.isNullOrEmpty()) {
                 for (i in result.listParent!!) {
                     var data: ModelReceiptData = i.value!![0]
+                    if (data.text.toLowerCase().contains("2,80")) {
+                        Log.d("#RORG", "2,80_" + data.top)
+                    }
                     if (data.left > halfLength) {
 
                         var array = ArrayList<ModelReceiptData>()
 
                         var height: Int = (data.bottom - data.top)
                         var min = data.top - (height / 2)
-                        var max = data.top + (height / 2)
+                        var max = data.bottom + (height / 2)
 
                         var isNew = true
                         for (j in min..max) {
@@ -122,25 +129,20 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             }
         }
 
-        for(i in listOpt){
-            var array=i.value as ArrayList<ModelReceiptData>
-            for(j in 0 until  array.size){
-                if(isReceiptTotal(array[j].text)){
+        for (i in listOpt) {
+            var array = i.value as ArrayList<ModelReceiptData>
+            for (j in 0 until array.size) {
+                if (isReceiptTotal(array[j].text)) {
 
-                    var receipt=result?.receipt
-                    receipt?.receiptTotal=array[j+1].text.toString()
-                    binding.model =receipt
+                    var receipt = result?.receipt
+                    receipt?.receiptTotal = array[j + 1].text.toString()
+                    binding.model = receipt
                     binding.notifyChange()
                 }
             }
         }
     }
 
-
-    fun postProcess(list: HashMap<Int, ArrayList<ModelReceiptData>?>) {
-
-
-    }
 
     override fun onClick(view: View?) {
         when (view?.id) {
@@ -157,7 +159,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     roomDB.productsDao().insertAll(receipt)
                     finish()
                 } else {
-                    showToast(this, "Please enter Receipt title")
+                    showToast(this, "Please enter receipt number.")
                 }
             }
             R.id.llAutoFill -> {
@@ -260,10 +262,20 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
         if (resultCode == Activity.RESULT_OK) {
 
+            var bitmap: Bitmap
+            if (reqCode == REQUEST_CODE_CAMERA) {
+                bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+            } else {
+                val imageStream = contentResolver.openInputStream(data!!.data!!)
+                bitmap = BitmapFactory.decodeStream(imageStream)
+            }
+
+
+            //  binding.rlBackground.background = BitmapDrawable(toGrayscale(bitmap) )
             data?.putExtra(getString(R.string.request_code), reqCode)
             data?.putExtra(getString(R.string.image_uri), imageUri)
             binding.indeterminateBar.visibility = View.VISIBLE
-            var mLoader = MyAsyncTask(this, data, imageUri)
+            var mLoader = MyAsyncTask(this, data, imageUri, reqCode)
             mLoader.registerListener(0) { loader, receipt ->
 
                 Log.d("#run", "over")
@@ -279,7 +291,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?) : AsyncTaskLoader<ModelAsyncResult>(context) {
+    class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?, var reqCode:Int) : AsyncTaskLoader<ModelAsyncResult>(context) {
 
         var pointer = 0
         var arrayParent = ArrayList<ArrayList<String>?>()
@@ -289,7 +301,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         lateinit var bitmap: Bitmap
         lateinit var bitmapTemp: Bitmap
         lateinit var bitmapOverlay: Bitmap
-        var reqCode = data?.getIntExtra(context.getString(R.string.request_code), 0)
+        //var reqCode = data?.getIntExtra(context.getString(R.string.request_code), 0)
         var paint = Paint()
 
         override fun onStartLoading() {
@@ -334,76 +346,81 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     val imageStream = context.contentResolver.openInputStream(data!!.data!!)
                     bitmap = BitmapFactory.decodeStream(imageStream)
                 }
-
                 bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
                 bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
                 frame = Frame.Builder().setBitmap(bitmap).build()
                 val items = textRecognizer.detect(frame)
 
-
-
-                items.valueAt(0).components
                 var listLength = items.valueAt(items.size() - 1).boundingBox.top
                 listParent = HashMap(listLength)
                 val stringBuilder = StringBuilder()
 
-                var half = bitmap.width / 2
-
                 for (i in 0 until items.size()) {
-                    val item = items.valueAt(i)
-                    item.components.size
-                    for (j in item.components) {
-                        var posTop = j.boundingBox.top
+
+                    var blockText = items.valueAt(i)
+                    var iterate: Int = blockText.value.split("\n").size
+                    for (zz in 0 until iterate) {
+
+                        var item = blockText.components[zz]
+                        if (item.value.toLowerCase().contains("samaksai eur")) {
+                            Log.d("#RORGXXZ", "samaksai eur_" + item.boundingBox.top)
+                        }
+                        if (item.value.toLowerCase().contains("2,80")) {
+                            Log.d("#RORGXXZ", "2,80" + item.boundingBox.top)
+                        }
+                        // for (j in item.components) {
+                        var posTop = item.boundingBox.top
 
                         var array = ArrayList<ModelReceiptData>()
                         if (listParent.containsKey(posTop)) {
                             array = listParent[posTop] as ArrayList<ModelReceiptData>
                         }
-                        var t_left = j.boundingBox.left
-                        var t_top = j.boundingBox.top
-                        var t_right = j.boundingBox.right
-                        var t_bottom = j.boundingBox.bottom
-                        array.add(ModelReceiptData(t_left, t_top, t_right, t_bottom, j.value))
+                        var tLeft = item.boundingBox.left
+                        var tTop = item.boundingBox.top
+                        var tRight = item.boundingBox.right
+                        var tBottom = item.boundingBox.bottom
+                        array.add(ModelReceiptData(tLeft, tTop, tRight, tBottom, item.value))
                         listParent[posTop] = array
-                        Log.d("HEIGHT__", "" + (t_bottom - t_top) + "__" + j.value.replace("/n", ""))
-                    }
+                        Log.d("HEIGHT__", "" + (tBottom - tTop) + "__" + item.value.replace("/n", ""))
+                        // }
 
-                    stringBuilder.append(item.value)
-                    Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
+                        stringBuilder.append(item.value)
+                        Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
 
-                    if (receipt.receiptNo.isEmpty()) {
-                        /****set receipt number****/
-                        receipt.receiptNo = getReceiptNumber(item.value).trim()
-                    }
-                    if (isReceiptTotal(item.value)) {
-                        /****set receipt total****/
-
-                        var strPrevious: String? = items.valueAt(i - 1).value.trim()
-                        var strNext: String? = items.valueAt(i + 1).value.trim()
-
-                        if (isStrNumber(strPrevious)) {
-                            if (isStrNumber(strNext)) {
-                                var numPrevious: Float? = strToNumber(strPrevious)?.toFloat()
-                                        ?: 0.00f
-                                var numNext: Float? = strToNumber(strNext)?.toFloat() ?: 0.00f
-                                if (numPrevious!! > numNext!!) {
-                                    receipt.receiptTotal = strPrevious ?: ""
-                                } else {
-                                    receipt.receiptTotal = strNext ?: ""
-                                }
-                            } else {
-                                receipt.receiptTotal = strPrevious ?: ""
-                            }
-                        } else if (i < (items.size() - 1) && isStrNumber(strNext)) {
-                            receipt.receiptTotal = strNext ?: ""
+                        if (receipt.receiptNo.isEmpty()) {
+                            /****set receipt number****/
+                            receipt.receiptNo = getReceiptNumber(item.value).trim()
                         }
+                        if (isReceiptTotal(item.value)) {
+                            /****set receipt total****/
+
+                            var strPrevious: String? = items.valueAt(i - 1).value.trim()
+                            var strNext: String? = items.valueAt(i + 1).value.trim()
+
+                            if (isStrNumber(strPrevious)) {
+                                if (isStrNumber(strNext)) {
+                                    var numPrevious: Float? = strToNumber(strPrevious)?.toFloat()
+                                            ?: 0.00f
+                                    var numNext: Float? = strToNumber(strNext)?.toFloat() ?: 0.00f
+                                    if (numPrevious!! > numNext!!) {
+                                        receipt.receiptTotal = strPrevious ?: ""
+                                    } else {
+                                        receipt.receiptTotal = strNext ?: ""
+                                    }
+                                } else {
+                                    receipt.receiptTotal = strPrevious ?: ""
+                                }
+                            } else if (i < (items.size() - 1) && isStrNumber(strNext)) {
+                                receipt.receiptTotal = strNext ?: ""
+                            }
+                        }
+                        if (isReceiptDate(item.value)) {
+                            receipt.receiptDate = item.value.trim()
+                        }
+                        stringBuilder.append("\n")
+                        createBoundingBox(item)
                     }
-                    if (isReceiptDate(item.value)) {
-                        receipt.receiptDate = item.value.trim()
-                    }
-                    stringBuilder.append("\n")
-                    createBoundingBox(item)
                 }
                 /****set receipt full text****/
                 receipt.receiptFullText = stringBuilder.toString().trim()
@@ -437,7 +454,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             var isReceipt = false
             var patternNumber = Regex("-?\\d+(\\.\\d+)?")
 
-            var arry = arrayOf("Ceks", "CEKS#", "Ceks nr.", "Ceka nr.", "Dok Nr", "Dok. Nr", "DOK. #", "Dokuments:", "Kvits", "Kvits Nr", "Kvits Nr.")
+            var arry = arrayOf(/*"Ceks", "CEKS#",*/ "Ceks nr.", "Ceka nr.", "Dok Nr", "Dok. Nr", "Dok, Nr", "DOK. #", "Dokuments:"/* "Kvits", "Kvits Nr", "Kvits Nr."*/)
             var receiptNo = ""
             var strLower = str.toLowerCase()
             arry.forEach {
@@ -453,9 +470,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             }
             return receiptNo
         }
-
-
-
 
 
     }

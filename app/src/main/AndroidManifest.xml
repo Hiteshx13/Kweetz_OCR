@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.kweetz.activity.AddReceiptActivity"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
              <!-- <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

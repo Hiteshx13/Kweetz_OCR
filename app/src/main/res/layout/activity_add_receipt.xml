@@ -54,18 +54,20 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Receipt Number"
+                    android:text="@string/receipt_number"
                     style="@style/StyleReceiptText" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etReceiptNumber"
                     style="@style/StyleEditText"
                     android:layout_width="0dp"
+                    android:textSize="@dimen/sp16"
                     android:text="@{model.receiptNo}"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:hint="@string/receipt_number"
                     android:layout_weight="3"
-                    tools:text="123456" />
+                    tools:text="" />
 
             </LinearLayout>
 
@@ -81,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     style="@style/StyleReceiptText"
-                    android:text="Receipt Date"
+                    android:text="@string/receipt_date"
                     />
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -91,8 +93,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textSize="@dimen/sp16"
                     android:layout_weight="3"
                     android:singleLine="true"
+                    android:hint="@string/receipt_date"
                     tools:text="15-11-2019" />
 
             </LinearLayout>
@@ -109,7 +113,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     style="@style/StyleReceiptText"
-                    android:text="Receipt Issuer"/>
+                    android:text="@string/receipt_issuer"/>
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etReceiptIssuer"
@@ -118,7 +122,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textSize="@dimen/sp16"
                     android:layout_weight="3"
+                    android:hint="@string/receipt_issuer"
                     android:singleLine="true"
                     tools:text="Abcd" />
 
@@ -135,7 +141,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Receipt Total"
+                    android:text="@string/receipt_total"
                     style="@style/StyleReceiptText"/>
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -144,9 +150,13 @@
                     android:text="@{model.receiptTotal}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/sp16"
                     android:layout_alignParentEnd="true"
                     android:layout_weight="3"
                     android:singleLine="true"
+                    android:overScrollMode="never"
+                    android:hint="@string/receipt_total"
+
                     tools:text="$22" />
 
             </LinearLayout>

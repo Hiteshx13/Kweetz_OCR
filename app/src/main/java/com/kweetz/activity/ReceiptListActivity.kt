@@ -1,5 +1,6 @@
 package com.kweetz.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +11,7 @@ import com.kweetz.adapter.RecyclerViewAdapter
 import com.kweetz.database.model.Receipt
 import com.kweetz.databinding.ActivityReceiptListBinding
 import com.kweetz.listener.OnItemClickListener
+import com.kweetz.utils.RECEIPT
 import com.kweetz.utils.lounchActivity
 import java.text.SimpleDateFormat
 
@@ -41,7 +43,10 @@ public class ReceiptListActivity : BaseActivity(), View.OnClickListener {
         binding.btnNewReceipt.setOnClickListener(this)
         adapter = RecyclerViewAdapter(this, listReceipts, object : OnItemClickListener {
             override fun onClick(pos: Int) {
-                lounchActivity(applicationContext, AddReceiptActivity.getIntent(applicationContext,listReceipts.get(pos)))
+                var intent = Intent(applicationContext, AddReceiptActivity::class.java)
+                intent.putExtra(RECEIPT, listReceipts.get(pos))
+                startActivity(intent)
+                //lounchActivity(applicationContext, AddReceiptActivity.getIntent(applicationContext,listReceipts.get(pos)))
             }
         })
         binding.rvReceipts.layoutManager = LinearLayoutManager(this)
