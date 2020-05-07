@@ -12,32 +12,27 @@ import com.kweetz.database.model.Receipt
 
 @Database(entities = arrayOf(Receipt::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    companion object{
+    companion object {
 
-    open fun getDatabase(context: Context) :AppDatabase{
-        var database: AppDatabase? = null
-        var db_name = context.getString(R.string.app_name).toString() + ".db"
-        if (database == null) {
-            synchronized(AppDatabase::class) {
-                if (database == null) {
-                    database = Room.databaseBuilder(
-                            context,
-                            AppDatabase::class.java, db_name
-                    ).allowMainThreadQueries().addCallback(object:RoomDatabase.Callback(){
+        open fun getDatabase(context: Context): AppDatabase {
+            var database: AppDatabase? = null
+            var db_name = context.getString(R.string.app_name).toString() + ".db"
+            if (database == null) {
+                synchronized(AppDatabase::class) {
+                    if (database == null) {
+                        database = Room.databaseBuilder(
+                                context,
+                                AppDatabase::class.java, db_name
+                        ).allowMainThreadQueries().addCallback(object : RoomDatabase.Callback() {
 
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-//                            Log.d("RoomDatabase","Populaing with data..")
-//                          var   ob =PopulateDbAsync(database).execute()
-                        }
-
-                    }).build()
+                        }).build()
+                    }
                 }
             }
+            return database!!
         }
-        return database!!
     }
-    }
+
     /* Room.databaseBuilder(
                     applicationContext,
                     AppDatabase::class.java,applicationContext.getString(R.string.app_name

@@ -74,11 +74,64 @@ fun isStrNumber(str: String?): Boolean {
 }
 
 fun isAlphaNumerical(str: String?): Boolean {
-    return str!=null&& str.matches(Regex( ".*[a-zA-Z1-9\\n].*"))
+    return str != null && str.matches(Regex(".*[a-zA-Z1-9\\n].*"))
+}
+
+fun isContainNumerical(str: String?): Boolean {
+    return str != null && str.matches(Regex(".*[1-9\\n].*"))
+}
+
+fun gerReceiptIssuer(str: String): String {
+    var isIssuer = false
+    var issuer = ""
+    var array = arrayOf("PVN LV", "PVN maksātāja kods", "FVN maksātāja kods", "PUN maksātāja kods", "PUN LV", "PUN LU")
+    array.forEach {
+
+        if (str.toLowerCase().contains(it.toLowerCase())) {
+            isIssuer = true
+            issuer = str.replace(it, "")
+        } else if (str.contains("FVN") || str.contains("PVN")) {
+            array = arrayOf("kods", "kous")
+            array.forEach {
+                if (str.contains(it.toLowerCase())) {
+                    issuer = str.substring(str.lastIndexOf(it), str.length).replace(it, "")
+
+                }
+            }
+        }
+    }
+
+    return issuer
+}
+
+fun getReceiptNumber(str: String): String {
+
+    var isReceipt = false
+    var patternNumber = Regex("-?\\d+(\\.\\d+)?")
+
+    var arry = arrayOf("Dok, Nr", "Dolk. Nr", "Dolk, Nr", "Dok Nr", "Dok. Nr", "DOK. #", "Ceks nr", "Ceks", "CEKS#", "Ceka nr", "Dokuments:", "Kvits Nr", "Kvits Nr.", "Kvits")
+    var receiptNo = ""
+    var strLower = str.toLowerCase()
+    arry.forEach {
+        if (strLower.contains(it.toLowerCase())) {
+            var newStr = str
+            var trimmed = strLower.replace(it.toLowerCase().toString(), "").trim()
+            if (isAlphaNumerical(trimmed)) {
+                if (isContainNumerical(trimmed)) {
+                    if (str.contains("\n")) {
+                        newStr = str.substring(0, str.indexOf("\n"))
+
+                    }
+                    receiptNo = newStr.replace(it, "")
+                }
+            }
+        }
+    }
+    return receiptNo
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("Samaksai EUR","Sanaksai EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
+    var arry = arrayOf("Samaksai EUR", "Sanaksai EUR", "Sarnaksai EUR", "Sarnäsai EUR", "Sarnäsaik EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
     var isTotal = false
     arry.forEach {
         if (str.toLowerCase().contains(it.toString().toLowerCase())) {
@@ -87,32 +140,67 @@ fun isReceiptTotal(str: String): Boolean {
     }
     return isTotal
 }
+
 fun isReceiptDate(strDate: String): Boolean {
     var isDate = false
     var dateFormat1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     var dateFormat2 = SimpleDateFormat("yyyy-MM-dd")
+    var dateFormat3 = SimpleDateFormat("DD.MM.yyyy")
+    var dateFormat4 = SimpleDateFormat("DD.MM.yyyy HH:mm")
 
-    try {
-        var date = dateFormat1.parse(strDate)
+    if (isDate(strDate, dateFormat1)) {
         isDate = true
-    } catch (e: Exception) {
-        Log.d("ParseException", "" + e.message)
+    } else if (isDate(strDate, dateFormat2)) {
+        isDate = true
+    } else if (isDate(strDate, dateFormat3)) {
+        isDate = true
+    } else if (isDate(strDate, dateFormat4)) {
+        isDate = true
     }
 
+    return isDate
+}
+
+fun isReceiptTime(strTime: String): Boolean {
+    var isTime = false
+    var dateFormat1 = SimpleDateFormat("HH:mm:ss")
+    var dateFormat2 = SimpleDateFormat("HH:mm")
+    if (isTime(strTime, dateFormat1)) {
+        isTime = true
+    } else if (isTime(strTime, dateFormat2)) {
+        isTime = true
+    }
+
+    return isTime
+}
+
+fun isDate(date: String, dateFormat: SimpleDateFormat): Boolean {
+    var isDate = false
     try {
-        var date = dateFormat2.parse(strDate)
+        var date = dateFormat.parse(date)
         isDate = true
     } catch (e: Exception) {
+        isDate = false
         Log.d("ParseException", "" + e.message)
     }
     return isDate
 }
 
-fun toGrayscale(bmpOriginal: Bitmap): Bitmap? {
-    val width: Int
-    val height: Int
-    height = bmpOriginal.height
-    width = bmpOriginal.width
+fun isTime(time: String, dateFormat: SimpleDateFormat): Boolean {
+    var isTime = false
+    try {
+        var time = dateFormat.parse(time)
+        isTime = true
+    } catch (e: Exception) {
+        isTime = false
+        Log.d("ParseException", "" + e.message)
+    }
+    return isTime
+}
+
+fun convevrtToGrayscale(bmpOriginal: Bitmap): Bitmap {
+    var height: Int = bmpOriginal.height
+    var width: Int = bmpOriginal.width
     val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val c = Canvas(bmpGrayscale)
     val paint = Paint()
@@ -123,6 +211,7 @@ fun toGrayscale(bmpOriginal: Bitmap): Bitmap? {
     c.drawBitmap(bmpOriginal, 0f, 0f, paint)
     return bmpGrayscale
 }
+
 fun strToNumber(str: String?): Number? {
 
     var num: Number? = null

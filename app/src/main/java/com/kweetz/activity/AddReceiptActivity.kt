@@ -86,9 +86,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             if (!result.listParent.isNullOrEmpty()) {
                 for (i in result.listParent!!) {
                     var data: ModelReceiptData = i.value!![0]
-                    if (data.text.toLowerCase().contains("2,80")) {
+                    /*if (data.text.toLowerCase().contains("2,80")) {
                         Log.d("#RORG", "2,80_" + data.top)
-                    }
+                    }*/
                     if (data.left > halfLength) {
 
                         var array = ArrayList<ModelReceiptData>()
@@ -291,7 +291,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?, var reqCode:Int) : AsyncTaskLoader<ModelAsyncResult>(context) {
+    class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?, var reqCode: Int) : AsyncTaskLoader<ModelAsyncResult>(context) {
 
         var pointer = 0
         var arrayParent = ArrayList<ArrayList<String>?>()
@@ -346,18 +346,19 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     val imageStream = context.contentResolver.openInputStream(data!!.data!!)
                     bitmap = BitmapFactory.decodeStream(imageStream)
                 }
+
                 bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
-                if(bitmap.width>bitmap.height){
-                    var matrix =  Matrix();
-                    matrix.postRotate(90f);
+                if (bitmap.width > bitmap.height) {
+                    var matrix = Matrix()
+                    matrix.postRotate(90f)
 
-                    var scalled= Bitmap.createScaledBitmap(bitmap,  bitmap.width, bitmap.height, true);
-                    bitmap= Bitmap.createBitmap(scalled, 0, 0, scalled.getWidth(), scalled.getHeight(), matrix, true);
+                    var scalled = Bitmap.createScaledBitmap(bitmap, bitmap.width, bitmap.height, true)
+                    bitmap = Bitmap.createBitmap(scalled, 0, 0, scalled.width, scalled.height, matrix, true)
                 }
 
 
-
+                bitmap = convevrtToGrayscale(bitmap)
                 bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
                 frame = Frame.Builder().setBitmap(bitmap).build()
@@ -399,12 +400,19 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         stringBuilder.append(item.value)
                         Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
 
+                        if (receipt.receiptIssuer.isEmpty()) {
+                            receipt.receiptIssuer = gerReceiptIssuer(item.value)
+                        }
                         if (receipt.receiptNo.isEmpty()) {
                             /****set receipt number****/
-                            receipt.receiptNo = getReceiptNumber(item.value).trim()
+                            var receiptNumber = getReceiptNumber(item.value).trim()
+                            if (!receiptNumber.isEmpty()) {
+                                receipt.receiptNo = receiptNumber
+                            }
                         }
-                        if (isReceiptTotal(item.value)) {
-                            /****set receipt total****/
+                        /*if (isReceiptTotal(item.value)) {
+                            */
+                        /****set receipt total****//*
 
                             var strPrevious: String? = items.valueAt(i - 1).value.trim()
                             var strNext: String? = items.valueAt(i + 1).value.trim()
@@ -425,9 +433,23 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                             } else if (i < (items.size() - 1) && isStrNumber(strNext)) {
                                 receipt.receiptTotal = strNext ?: ""
                             }
-                        }
+                        }*/
                         if (isReceiptDate(item.value)) {
-                            receipt.receiptDate = item.value.trim()
+
+                            var receiptTime = ""
+                            if (isReceiptTime(receipt.receiptDate)) {
+                                receiptTime = receipt.receiptDate
+                            }
+                            receipt.receiptDate = item.value.trim() + " " + receiptTime
+                        }
+
+                        if (isReceiptTime(item.value)) {
+
+                            var receiptdate = ""
+                            if (isReceiptDate(receipt.receiptDate)) {
+                                receiptdate = receipt.receiptDate
+                            }
+                            receipt.receiptDate = receiptdate + " " + item.value.trim()
                         }
                         stringBuilder.append("\n")
                         createBoundingBox(item)
@@ -458,28 +480,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             canvas.drawRect(item.boundingBox, paint)
             canvas.drawText(item.value, item.boundingBox.left.toFloat(), item.boundingBox.top.toFloat(), paint)
             canvasOverlay.drawBitmap(bitmapTemp, Matrix(), null)
-        }
-
-        fun getReceiptNumber(str: String): String {
-
-            var isReceipt = false
-            var patternNumber = Regex("-?\\d+(\\.\\d+)?")
-
-            var arry = arrayOf(/*"Ceks", "CEKS#",*/ "Ceks nr.", "Ceka nr.", "Dok Nr", "Dok. Nr", "Dok, Nr", "DOK. #", "Dokuments:"/* "Kvits", "Kvits Nr", "Kvits Nr."*/)
-            var receiptNo = ""
-            var strLower = str.toLowerCase()
-            arry.forEach {
-                if (strLower.contains(it.toString().toLowerCase())) {
-                    var newStr = str
-                    if (isAlphaNumerical(strLower.replace(it.toLowerCase().toString(), ""))) {
-                        if (str.contains("\n")) {
-                            newStr = str.substring(0, str.indexOf("\n"))
-                        }
-                        receiptNo = newStr.replace(it, "")
-                    }
-                }
-            }
-            return receiptNo
         }
 
 

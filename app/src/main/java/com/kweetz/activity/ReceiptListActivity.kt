@@ -26,7 +26,6 @@ public class ReceiptListActivity : BaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_receipt_list)
         initialization()
-
     }
 
 
