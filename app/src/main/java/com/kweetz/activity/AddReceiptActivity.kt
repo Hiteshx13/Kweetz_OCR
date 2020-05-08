@@ -59,7 +59,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             var data = ModelAsyncResult(null, intent!!.getParcelableExtra(RECEIPT) as Receipt, null)
             updateUI(data)
         }
-
     }
 
     fun initialization() {
@@ -86,13 +85,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             if (!result.listParent.isNullOrEmpty()) {
                 for (i in result.listParent!!) {
                     var data: ModelReceiptData = i.value!![0]
-                    /*if (data.text.toLowerCase().contains("2,80")) {
-                        Log.d("#RORG", "2,80_" + data.top)
-                    }*/
-                    if (data.left > halfLength) {
 
+                    if (data.right > halfLength) {
                         var array = ArrayList<ModelReceiptData>()
-
                         var height: Int = (data.bottom - data.top)
                         var min = data.top - (height / 2)
                         var max = data.bottom + (height / 2)
@@ -132,13 +127,40 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         for (i in listOpt) {
             var array = i.value as ArrayList<ModelReceiptData>
             for (j in 0 until array.size) {
-                if (isReceiptTotal(array[j].text)) {
+                var model = array[j]
 
+                // array.forEach { model ->
+                if (result?.receipt?.receiptNo?.isEmpty() == true) {
+                    var receiptNo = ""
+                    var receiptNumber = getReceiptNumber(model.text)
+                    if (receiptNumber.isNotEmpty()) {
+
+                        var trimmed = model.text.replace(receiptNumber, "").trim()
+
+                        if (trimmed.isEmpty()) {
+                            receiptNo = array[j + 1].text
+                        }else{
+                            if (isAlphaNumerical(trimmed)) {
+                                if (isContainNumerical(trimmed)) {
+                                    receiptNo = trimmed
+                                    if (trimmed.contains("\n")) {
+                                        receiptNo = trimmed.substring(0, trimmed.indexOf("\n"))
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                    result.receipt?.receiptNo = receiptNo
+                }
+
+                if (isReceiptTotal(model.text)) {
                     var receipt = result?.receipt
                     receipt?.receiptTotal = array[j + 1].text.toString()
                     binding.model = receipt
                     binding.notifyChange()
                 }
+                // }
             }
         }
     }
@@ -301,6 +323,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         lateinit var bitmap: Bitmap
         lateinit var bitmapTemp: Bitmap
         lateinit var bitmapOverlay: Bitmap
+
         //var reqCode = data?.getIntExtra(context.getString(R.string.request_code), 0)
         var paint = Paint()
 
@@ -403,13 +426,13 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         if (receipt.receiptIssuer.isEmpty()) {
                             receipt.receiptIssuer = gerReceiptIssuer(item.value)
                         }
-                        if (receipt.receiptNo.isEmpty()) {
-                            /****set receipt number****/
+                       /* if (receipt.receiptNo.isEmpty()) {
+                            *//****set receipt number****//*
                             var receiptNumber = getReceiptNumber(item.value).trim()
                             if (!receiptNumber.isEmpty()) {
                                 receipt.receiptNo = receiptNumber
                             }
-                        }
+                        }*/
                         /*if (isReceiptTotal(item.value)) {
                             */
                         /****set receipt total****//*
@@ -434,21 +457,19 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                                 receipt.receiptTotal = strNext ?: ""
                             }
                         }*/
-                        if (isReceiptDate(item.value)) {
 
-                            var receiptTime = ""
-                            if (isReceiptTime(receipt.receiptDate)) {
-                                receiptTime = receipt.receiptDate
-                            }
+
+                        if (isDateTimePattern(item.value)) {
+                            receipt.receiptDate = item.value.trim()
+                        } else if (isDatePattern(item.value)) {
+
+                            /* if (isTimePattern(receipt.receiptDate)) {
+                                 receiptTime = receipt.receiptDate
+                             }*/
+                            val receiptTime = receipt.receiptDate
                             receipt.receiptDate = item.value.trim() + " " + receiptTime
-                        }
-
-                        if (isReceiptTime(item.value)) {
-
-                            var receiptdate = ""
-                            if (isReceiptDate(receipt.receiptDate)) {
-                                receiptdate = receipt.receiptDate
-                            }
+                        } else if (isTimePattern(item.value)) {
+                            val receiptdate = receipt.receiptDate
                             receipt.receiptDate = receiptdate + " " + item.value.trim()
                         }
                         stringBuilder.append("\n")

@@ -74,11 +74,63 @@ fun isStrNumber(str: String?): Boolean {
 }
 
 fun isAlphaNumerical(str: String?): Boolean {
-    return str != null && str.matches(Regex(".*[a-zA-Z1-9\\n].*"))
+    return str != null && str.matches(Regex("[a-zA-Z0-9 \\n]"))
 }
 
 fun isContainNumerical(str: String?): Boolean {
-    return str != null && str.matches(Regex(".*[1-9\\n].*"))
+    return str != null && str.matches(Regex("[0-9 \\n]"))
+}
+
+fun isDateTimePattern(str: String): Boolean {
+    /**yyyy-mm-dd hh:mm:ss*/
+    val pattern1 = "(?:(.*[0-9]{4}+)-) ?(?:([0-9]{2}+)-) ?(?:([0-9]{2}+)) ?(?:([0-9]{2}+):)?(?:([0-9]{2}+):) ?(?:([0-9]{2}.*+))"
+
+    /**yyyy.mm.dd hh:mm:ss*/
+    val pattern2 = "(?:(.*[0-9]{4}+)\\.) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{2}+)) ?(?:([0-9]{2}+):)?(?:([0-9]{2}+):) ?(?:([0-9]{2}.*+))"
+
+    /**dd-mm-yyyy hh:mm:ss*/
+    val pattern3 = "(?:(.*[0-9]{2}+)-) ?(?:([0-9]{2}+)-) ?(?:([0-9]{4}+)) ?(?:([0-9]{2}+):)?(?:([0-9]{2}+):) ?(?:([0-9]{2}.*+))"
+
+    /**dd.mm.yyyy hh:mm:ss*/
+    val pattern4 = "(?:(.*[0-9]{2}+)\\.) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{4}+)) ?(?:([0-9]{2}+):)?(?:([0-9]{2}+):) ?(?:([0-9]{2}.*+))"
+
+
+    return str.matches(Regex(pattern1))
+            || str.matches(Regex(pattern2))
+            || str.matches(Regex(pattern3))
+            || str.matches(Regex(pattern4))
+}
+
+fun isDatePattern(str: String): Boolean {
+
+    /**yyyy-mm-dd*/
+    val pattern1 = "(?:(.*[0-9]{4}+)-) ?(?:([0-9]{2}+)-) ?(?:([0-9]{2}.*+))"
+
+    /**yyyy.mm.dd*/
+    val pattern2 = "(?:(.*[0-9]{4}+)\\.) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{2}.*+))"
+
+    /**dd-mm-yyyy*/
+    val pattern3 = "(?:(.*[0-9]{2}+)-) ?(?:([0-9]{2}+)-) ?(?:([0-9]{4}.*+))"
+
+    /**dd.mm.yyyy*/
+    val pattern4 = "(?:(.*[0-9]{2}+)\\.) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{4}.*+))"
+
+    return str.matches(Regex(pattern1))
+            || str.matches(Regex(pattern2))
+            || str.matches(Regex(pattern3))
+            || str.matches(Regex(pattern4))
+}
+
+fun isTimePattern(str: String): Boolean {
+    /**hh:mm:ss*/
+    val pattern1 = ".*(?:([0-9]{2}))(?:[:])(?:([0-9]{2}))(?:[:])(?:([0-9]{2})).*"
+
+    /**hh:mm*/
+    val pattern2 = ".*(?:([0-9]{2}))(?:[:])(?:([0-9]{2})).*"
+
+
+    return str.matches(Regex(pattern1))
+            || str.matches(Regex(pattern2))
 }
 
 fun gerReceiptIssuer(str: String): String {
@@ -106,37 +158,33 @@ fun gerReceiptIssuer(str: String): String {
 
 fun getReceiptNumber(str: String): String {
 
-    var isReceipt = false
-    var patternNumber = Regex("-?\\d+(\\.\\d+)?")
+    var arry = arrayOf("dok, nr", "dolk. nr", "dolk, nr", "dok. nr", "dok. #", "ceks nr", "ceks", "ceks#", "ceka nr", "dokuments:", "kvits nr", "kvits nr.", "kvits")
 
-    var arry = arrayOf("Dok, Nr", "Dolk. Nr", "Dolk, Nr", "Dok Nr", "Dok. Nr", "DOK. #", "Ceks nr", "Ceks", "CEKS#", "Ceka nr", "Dokuments:", "Kvits Nr", "Kvits Nr.", "Kvits")
-    var receiptNo = ""
-    var strLower = str.toLowerCase()
+    var text = ""
     arry.forEach {
-        if (strLower.contains(it.toLowerCase())) {
-            var newStr = str
-            var trimmed = strLower.replace(it.toLowerCase().toString(), "").trim()
+        if (str.toLowerCase().contains(it.toLowerCase())) {
+            text = it
+
+/*var trimmed = strLower.replace(it.toLowerCase().toString(), "").trim()
             if (isAlphaNumerical(trimmed)) {
                 if (isContainNumerical(trimmed)) {
-                    if (str.contains("\n")) {
-                        newStr = str.substring(0, str.indexOf("\n"))
-
+                    receiptNo = trimmed
+                    if (trimmed.contains("\n")) {
+                        newStr = trimmed.substring(0, str.indexOf("\n"))
+                        receiptNo = newStr
                     }
-                    receiptNo = newStr.replace(it, "")
                 }
-            }
+            }*/
         }
     }
-    return receiptNo
+    return text
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("Samaksai EUR", "Sanaksai EUR", "Sarnaksai EUR", "Sarnäsai EUR", "Sarnäsaik EUR", "Kopa apmaksai", "Samaksa EUR", "Kopeja summa apmaksai", "Kopsumma EUR", "KOPA", "KOPA SUMMA", "Kopa EUR")
+    var arry = arrayOf("samaksai eur", "sanaksai eur", "sarnaksai eur", "sarnäsai eur", "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur", "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur")
     var isTotal = false
-    arry.forEach {
-        if (str.toLowerCase().contains(it.toString().toLowerCase())) {
-            isTotal = true
-        }
+    if (arry.contains(str.toLowerCase())) {
+        isTotal = true
     }
     return isTotal
 }
@@ -161,18 +209,6 @@ fun isReceiptDate(strDate: String): Boolean {
     return isDate
 }
 
-fun isReceiptTime(strTime: String): Boolean {
-    var isTime = false
-    var dateFormat1 = SimpleDateFormat("HH:mm:ss")
-    var dateFormat2 = SimpleDateFormat("HH:mm")
-    if (isTime(strTime, dateFormat1)) {
-        isTime = true
-    } else if (isTime(strTime, dateFormat2)) {
-        isTime = true
-    }
-
-    return isTime
-}
 
 fun isDate(date: String, dateFormat: SimpleDateFormat): Boolean {
     var isDate = false
@@ -229,7 +265,6 @@ fun strToNumber(str: String?): Number? {
         } catch (e: NumberFormatException) {
 
         }
-
     }
     return num
 }
