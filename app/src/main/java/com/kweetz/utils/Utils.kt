@@ -74,11 +74,11 @@ fun isStrNumber(str: String?): Boolean {
 }
 
 fun isAlphaNumerical(str: String?): Boolean {
-    return str != null && str.matches(Regex("[a-zA-Z0-9 \\n]"))
+    return str != null && str.matches(Regex(".*(?:[a-zA-Z0-9]).*"))
 }
 
 fun isContainNumerical(str: String?): Boolean {
-    return str != null && str.matches(Regex("[0-9 \\n]"))
+    return str != null && str.matches(Regex("[0-9]"))
 }
 
 fun isDateTimePattern(str: String): Boolean {
@@ -134,14 +134,12 @@ fun isTimePattern(str: String): Boolean {
 }
 
 fun gerReceiptIssuer(str: String): String {
-    var isIssuer = false
     var issuer = ""
     var array = arrayOf("PVN LV", "PVN maksātāja kods", "FVN maksātāja kods", "PUN maksātāja kods", "PUN LV", "PUN LU")
     array.forEach {
 
-        if (str.toLowerCase().contains(it.toLowerCase())) {
-            isIssuer = true
-            issuer = str.replace(it, "")
+        if (str.contains(it,true)) {
+            issuer = str.replace(it, "",true)
         } else if (str.contains("FVN") || str.contains("PVN")) {
             array = arrayOf("kods", "kous")
             array.forEach {
@@ -181,7 +179,7 @@ fun getReceiptNumber(str: String): String {
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("samaksai eur", "sanaksai eur", "sarnaksai eur", "sarnäsai eur", "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur", "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur")
+    var arry = arrayOf("samaksai eur","kopã apmaksai", "sanaksai eur", "sarnaksai eur", "sarnäsai eur", "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur", "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur")
     var isTotal = false
     if (arry.contains(str.toLowerCase())) {
         isTotal = true

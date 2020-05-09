@@ -135,18 +135,18 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     var receiptNumber = getReceiptNumber(model.text)
                     if (receiptNumber.isNotEmpty()) {
 
-                        var trimmed = model.text.replace(receiptNumber, "").trim()
+                        var trimmed = model.text.toLowerCase().replace(receiptNumber, "").trim()
 
                         if (trimmed.isEmpty()) {
                             receiptNo = array[j + 1].text
                         }else{
                             if (isAlphaNumerical(trimmed)) {
-                                if (isContainNumerical(trimmed)) {
+                               // if (isContainNumerical(trimmed)) {
                                     receiptNo = trimmed
                                     if (trimmed.contains("\n")) {
                                         receiptNo = trimmed.substring(0, trimmed.indexOf("\n"))
                                     }
-                                }
+                                //}
                             }
                         }
 
