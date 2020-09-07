@@ -78,7 +78,7 @@ fun isAlphaNumerical(str: String?): Boolean {
 }
 
 fun isContainNumerical(str: String?): Boolean {
-    return str != null && str.matches(Regex("[0-9]"))
+    return str != null && str.matches(Regex(".*(?:[0-9]).*"))
 }
 
 fun isDateTimePattern(str: String): Boolean {
@@ -138,8 +138,8 @@ fun gerReceiptIssuer(str: String): String {
     var array = arrayOf("PVN LV", "PVN maksātāja kods", "FVN maksātāja kods", "PUN maksātāja kods", "PUN LV", "PUN LU")
     array.forEach {
 
-        if (str.contains(it,true)) {
-            issuer = str.replace(it, "",true)
+        if (str.contains(it, true)) {
+            issuer = str.replace(it, "", true)
         } else if (str.contains("FVN") || str.contains("PVN")) {
             array = arrayOf("kods", "kous")
             array.forEach {
@@ -156,30 +156,28 @@ fun gerReceiptIssuer(str: String): String {
 
 fun getReceiptNumber(str: String): String {
 
-    var arry = arrayOf("dok, nr", "dolk. nr", "dolk, nr", "dok. nr", "dok. #", "ceks nr", "ceks", "ceks#", "ceka nr", "dokuments:", "kvits nr", "kvits nr.", "kvits")
+    var arry = arrayOf("dok, nr", "dolk. nr", "dolk, nr", "dok. nr", "dok. #", "ceks nr","dok. nir", "ceks", "ceks#", "ceka nr", "dokuments:", "kvits nr", "kvits nr.", "kvits","dox. nr","lok. nr")
 
+    if (str.equals("Dok. Nr. 96/151824 Kase 00001")) {
+        Log.d("", "")
+    }
     var text = ""
     arry.forEach {
         if (str.toLowerCase().contains(it.toLowerCase())) {
             text = it
-
-/*var trimmed = strLower.replace(it.toLowerCase().toString(), "").trim()
-            if (isAlphaNumerical(trimmed)) {
-                if (isContainNumerical(trimmed)) {
-                    receiptNo = trimmed
-                    if (trimmed.contains("\n")) {
-                        newStr = trimmed.substring(0, str.indexOf("\n"))
-                        receiptNo = newStr
-                    }
-                }
-            }*/
+            return text
         }
+
     }
     return text
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("samaksai eur","kopã apmaksai", "sanaksai eur", "sarnaksai eur", "sarnäsai eur", "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur", "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur")
+    var arry = arrayOf("samaksai eur", "samaksal eur", "kopã apmaksai", "samaks", "samaksa1 elr", "sanaksai eur", "samaksai elr", "sanaksai elr", "sarnaksai eur", "sarnäsai eur", "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur", "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur")
+
+    if (str.equals("Sanaksai EUR")) {
+        Log.d("", "")
+    }
     var isTotal = false
     if (arry.contains(str.toLowerCase())) {
         isTotal = true

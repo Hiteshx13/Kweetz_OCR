@@ -7,5 +7,5 @@
         android:color="@color/colorPrimary"/>
 
     <size
-        android:height="@dimen/dp2"/>
+        android:height="@dimen/dp4"/>
 </shape>

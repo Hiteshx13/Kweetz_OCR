@@ -70,7 +70,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     fun onClickListener() {
         binding.llAutoFill.setOnClickListener(this)
-        binding.tvSave.setOnClickListener(this)
+        binding.llSave.setOnClickListener(this)
     }
 
     fun updateUI(result: ModelAsyncResult?) {
@@ -81,71 +81,105 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         if (result?.bitmap?.width ?: 0 > 0) {
 
             var halfLength = (result!!.bitmap?.width ?: 0) / 2
+            var thirdLength = (result!!.bitmap?.width ?: 0) / 3
 
             if (!result.listParent.isNullOrEmpty()) {
                 for (i in result.listParent!!) {
-                    var data: ModelReceiptData = i.value!![0]
+                    var arrayList: ArrayList<ModelReceiptData>? = i.value
+                    arrayList?.forEach { data ->
 
-                    if (data.right > halfLength) {
-                        var array = ArrayList<ModelReceiptData>()
+                        if (data.text.equals("Dok. Nr.: 516/205898 Kase 0003")) {
+                            Log.d("", "")
+                        }
                         var height: Int = (data.bottom - data.top)
                         var min = data.top - (height / 2)
                         var max = data.bottom + (height / 2)
 
-                        var isNew = true
-                        for (j in min..max) {
-                            if (result.listParent!!.containsKey(j) && j != data.top) {
-                                array = result.listParent!![j] as ArrayList<ModelReceiptData>
-                                if (isAlphaNumerical(array[0].text)) {
-                                    array.add(data)
-                                    listTemp[j] = array
-                                    Log.d("#Found__" + j, "__" + data.top)
-                                    isNew = false
-                                    break
+                        Log.d("#Data_", "" + data.text + "_height" + height + "_top_" + data.top + "_min_" + min + "_max_" + max)
+                        if (data.left > thirdLength) {
+                            var array = ArrayList<ModelReceiptData>()
+
+                            if (data.text.equals("FB number: 094609540972556")) {
+                                Log.d("", "")
+                            }
+                            var isNew = true
+                            var isAdded = false
+                            for (j in min..max) {
+
+                                if (j == 1432) {
+                                    Log.d("", "")
+                                }
+                                if (result.listParent!!.containsKey(j) /*&& j != data.top*/) {
+                                    array = result.listParent!![j] as ArrayList<ModelReceiptData>
+
+                                    if (isAlphaNumerical(data.text)) {
+                                        array.forEach { childItem ->
+                                            if (childItem.text.equals(data.text, true)) {
+                                                isNew = false
+                                            }
+                                        }
+                                        if (isNew) {
+                                            array.add(data)
+                                            listTemp[j] = array
+                                            isAdded = true
+                                            break
+                                        } else {
+                                            listTemp[j] = array
+                                            isAdded = true
+                                        }
+
+                                    }
+                                } else {
+//                                    array.add(data)
+                                    listTemp[data.top] = array
+                                    isAdded = true
                                 }
                             }
+
+                            if (!isAdded) {
+                                array.add(data)
+                                listTemp[data.top] = array
+                            }
+
+                        } else {
+                            listTemp[i.key] = i.value
                         }
-                        if (isNew) {
-                            array.add(data)
-                            listTemp[i.key] = array
-                        }
-                    } else {
-                        listTemp[i.key] = i.value
                     }
                 }
             }
         }
 
 
-        var listOpt = HashMap<Int, ArrayList<ModelReceiptData>?>()
-        for (i in listTemp) {
-            if (i.value?.size ?: 0 > 1) {
-                listOpt[i.key] = i.value
-            }
-        }
+//        var listOpt = HashMap<Int, ArrayList<ModelReceiptData>?>()
+//        for (i in listTemp) {
+//            if (i.value?.size ?: 0 > 1) {
+//                listOpt[i.key] = i.value
+//            }
+//        }
 
-        for (i in listOpt) {
+        for (i in listTemp) {
             var array = i.value as ArrayList<ModelReceiptData>
             for (j in 0 until array.size) {
                 var model = array[j]
-
+//7,12_height63_top_4005_min_3974_max_4099
+// Samaksai EUR_height70_top_3795_min_3760_max_3900
                 // array.forEach { model ->
                 if (result?.receipt?.receiptNo?.isEmpty() == true) {
                     var receiptNo = ""
                     var receiptNumber = getReceiptNumber(model.text)
                     if (receiptNumber.isNotEmpty()) {
 
-                        var trimmed = model.text.toLowerCase().replace(receiptNumber, "").trim()
+                        var trimmed = model.text.replace(receiptNumber, "", true).replace("o", "0", true).trim()
 
-                        if (trimmed.isEmpty()) {
-                            receiptNo = array[j + 1].text
-                        }else{
-                            if (isAlphaNumerical(trimmed)) {
-                               // if (isContainNumerical(trimmed)) {
-                                    receiptNo = trimmed
-                                    if (trimmed.contains("\n")) {
-                                        receiptNo = trimmed.substring(0, trimmed.indexOf("\n"))
-                                    }
+                        if (!trimmed.isEmpty()) {
+                            // receiptNo = array[j + 1].text
+//                        } else {
+                            if (isContainNumerical(trimmed)) {
+                                // if (isContainNumerical(trimmed)) {
+                                receiptNo = trimmed
+                                if (trimmed.contains("\n")) {
+                                    receiptNo = trimmed.substring(0, trimmed.indexOf("\n"))
+                                }
                                 //}
                             }
                         }
@@ -153,22 +187,31 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     }
                     result.receipt?.receiptNo = receiptNo
                 }
-
+//3,96_height55_top_3311_min_3293_max_3384
+//Sanaksai EUR_height_67_top_3113_min_3091_max_3202
                 if (isReceiptTotal(model.text)) {
                     var receipt = result?.receipt
-                    receipt?.receiptTotal = array[j + 1].text.toString()
+                    try {
+                        receipt?.receiptTotal = array[j + 1].text.toString()
+                    } catch (e: Exception) {
+
+                    }
                     binding.model = receipt
                     binding.notifyChange()
                 }
-                // }
             }
         }
+
+        var receipt = result?.receipt
+        //receipt?.receiptTotal = array[j + 1].text.toString()
+        binding.model = receipt
+        binding.notifyChange()
     }
 
 
     override fun onClick(view: View?) {
         when (view?.id) {
-            R.id.tvSave -> {
+            R.id.llSave -> {
                 var receiptNumber = binding.etReceiptNumber.text.toString()
                 var receiptDate = binding.etReceiptDate.text.toString()
                 var receiptIssuer = binding.etReceiptIssuer.text.toString()
@@ -387,8 +430,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 frame = Frame.Builder().setBitmap(bitmap).build()
                 val items = textRecognizer.detect(frame)
 
-                var listLength = items.valueAt(items.size() - 1).boundingBox.top
-                listParent = HashMap(listLength)
+//                var listLength = items.valueAt(items.size() - 1).boundingBox.top
+                listParent = HashMap()
                 val stringBuilder = StringBuilder()
 
                 for (i in 0 until items.size()) {
@@ -398,12 +441,12 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     for (zz in 0 until iterate) {
 
                         var item = blockText.components[zz]
-                        if (item.value.toLowerCase().contains("samaksai eur")) {
-                            Log.d("#RORGXXZ", "samaksai eur_" + item.boundingBox.top)
-                        }
-                        if (item.value.toLowerCase().contains("2,80")) {
-                            Log.d("#RORGXXZ", "2,80" + item.boundingBox.top)
-                        }
+//                        if (item.value.toLowerCase().contains("samaksai eur")) {
+//                            Log.d("#RORGXXZ", "samaksai eur_" + item.boundingBox.top)
+//                        }
+//                        if (item.value.toLowerCase().contains("2,80")) {
+//                            Log.d("#RORGXXZ", "2,80" + item.boundingBox.top)
+//                        }
                         // for (j in item.components) {
                         var posTop = item.boundingBox.top
 
@@ -426,8 +469,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         if (receipt.receiptIssuer.isEmpty()) {
                             receipt.receiptIssuer = gerReceiptIssuer(item.value)
                         }
-                       /* if (receipt.receiptNo.isEmpty()) {
-                            *//****set receipt number****//*
+                        /* if (receipt.receiptNo.isEmpty()) {
+                             */
+                        /****set receipt number****//*
                             var receiptNumber = getReceiptNumber(item.value).trim()
                             if (!receiptNumber.isEmpty()) {
                                 receipt.receiptNo = receiptNumber
