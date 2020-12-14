@@ -83,6 +83,129 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         binding.llSave.setOnClickListener(this)
     }
 
+    fun firebaseTextDetection(context: Context,  data: Intent?, imageUri: Uri?, reqCode: Int){
+
+        var pointer = 0
+        var arrayParent = ArrayList<ArrayList<String>?>()
+        lateinit var listParent: HashMap<Int, ArrayList<ModelReceiptData>?>
+        var textRecognizer: TextRecognizer = TextRecognizer.Builder(context).build()
+         var receipt= Receipt()
+        lateinit var bitmap: Bitmap
+        lateinit var bitmapTemp: Bitmap
+        lateinit var bitmapOverlay: Bitmap
+
+        try {
+            arrayParent = ArrayList()
+            val frame: Frame
+            if (reqCode == REQUEST_CODE_CAMERA) {
+                bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+            } else {
+                val imageStream = context.contentResolver.openInputStream(data!!.data!!)
+                bitmap = BitmapFactory.decodeStream(imageStream)
+            }
+//                firebaseTextDetection(bitmap)
+            bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+
+            if (bitmap.width > bitmap.height) {
+                var matrix = Matrix()
+                matrix.postRotate(90f)
+
+                var scalled = Bitmap.createScaledBitmap(bitmap, bitmap.width, bitmap.height, true)
+                bitmap = Bitmap.createBitmap(scalled, 0, 0, scalled.width, scalled.height, matrix, true)
+            }
+
+            bitmap = convevrtToGrayscale(bitmap)
+            bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+
+            frame = Frame.Builder().setBitmap(bitmap).build()
+            val items = textRecognizer.detect(frame)
+
+            listParent = HashMap()
+            val stringBuilder = StringBuilder()
+
+
+            val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
+            val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
+                    .onDeviceTextRecognizer
+            val result: Task<FirebaseVisionText> = detector.processImage(image)
+                    .addOnSuccessListener {
+                        val resultText = it.text
+                        for (block in it.textBlocks) {
+                            val blockText = block.text
+                            val blockConfidence = block.confidence
+                            val blockLanguages = block.recognizedLanguages
+                            val blockCornerPoints = block.cornerPoints
+                            val blockFrame = block.boundingBox
+                            for (line in block.lines) {
+                                val lineText = line.text
+
+                                val lineConfidence = line.confidence
+                                val lineLanguages = line.recognizedLanguages
+                                val lineCornerPoints = line.cornerPoints
+                                val lineFrame = line.boundingBox
+//                                for (element in line.elements) {
+                                    val item = line
+
+//                                        var item = blockText.components[zz]
+                                    var posTop = item.boundingBox!!.top
+                                    Log.d("#Firebase: ",""+item.text+"_top:"+item.boundingBox!!.top)
+                                    var array = ArrayList<ModelReceiptData>()
+                                    if (listParent.containsKey(posTop)) {
+                                        array = listParent[posTop] as ArrayList<ModelReceiptData>
+                                    }
+                                    var tLeft = item.boundingBox!!.left
+                                    var tTop = item.boundingBox!!.top
+                                    var tRight = item.boundingBox!!.right
+                                    var tBottom = item.boundingBox!!.bottom
+                                    array.add(ModelReceiptData(tLeft, tTop, tRight, tBottom, item.text))
+                                    listParent[posTop] = array
+                                    stringBuilder.append(item.text)
+
+                                    if (receipt.receiptIssuer.isEmpty()) {
+                                        receipt.receiptIssuer = gerReceiptIssuer(replaceSpecialChar(item.text.trim()))
+                                    }
+
+                                    if (isDateTimePattern(item.text)) {
+                                        receipt.receiptDate = item.text.trim()
+                                    } else if (isDatePattern(item.text)) {
+                                        val receiptTime = replaceSpace(receipt.receiptDate)
+                                        receipt.receiptDate = item.text.trim() + " " + receiptTime
+                                    } else if (isTimePattern(item.text)) {
+                                        val receiptdate = receipt.receiptDate
+                                        receipt.receiptDate = receiptdate + " " + replaceSpace(item.text)
+                                    }
+                                    stringBuilder.append("\n")
+
+
+////                                    Log.d("#Firebase: ",""+elementText)
+//                                    val elementConfidence = element.confidence
+//                                    val elementLanguages = element.recognizedLanguages
+//                                    val elementCornerPoints = element.cornerPoints
+//                                    val elementFrame = element.boundingBox
+//                                }
+                            }
+                        }
+                        receipt.receiptFullText = stringBuilder.toString().trim()
+                        updateUI(ModelAsyncResult(bitmapOverlay, receipt, listParent))
+                    }
+                    .addOnFailureListener(
+                            object : OnFailureListener {
+                                override fun onFailure(p0: java.lang.Exception) {
+                                    Log.d("#Firebase: ","")
+                                }
+
+                            })
+
+//                    }
+//                }
+
+
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+
+        }
+
+        }
     fun updateUI(result: ModelAsyncResult?) {
 
         var listTemp = HashMap<Int, ArrayList<ModelReceiptData>?>()
@@ -98,9 +221,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     var arrayList: ArrayList<ModelReceiptData>? = i.value
                     arrayList?.forEach { data ->
 
-                        if (data.text.equals("Dok. Nr.: 516/205898 Kase 0003")) {
-                            Log.d("", "")
-                        }
                         var height: Int = (data.bottom - data.top)
                         var min = data.top - (height / 2)
                         var max = data.bottom + (height / 2)
@@ -109,16 +229,11 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         if (data.left > thirdLength) {
                             var array = ArrayList<ModelReceiptData>()
 
-                            if (data.text.equals("FB number: 094609540972556")) {
-                                Log.d("", "")
-                            }
+
                             var isNew = true
                             var isAdded = false
                             for (j in min..max) {
 
-                                if (j == 1432) {
-                                    Log.d("", "")
-                                }
                                 if (result.listParent!!.containsKey(j) /*&& j != data.top*/) {
                                     array = result.listParent!![j] as ArrayList<ModelReceiptData>
 
@@ -216,6 +331,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         //receipt?.receiptTotal = array[j + 1].text.toString()
         binding.model = receipt
         binding.notifyChange()
+        binding.indeterminateBar.visibility = View.GONE
     }
 
 
@@ -350,16 +466,17 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             data?.putExtra(getString(R.string.request_code), reqCode)
             data?.putExtra(getString(R.string.image_uri), imageUri)
             binding.indeterminateBar.visibility = View.VISIBLE
-            var mLoader = MyAsyncTask(this, data, imageUri, reqCode)
-            mLoader.registerListener(0) { loader, receipt ->
-
-                Log.d("#run", "over")
-                binding.indeterminateBar.visibility = View.GONE
-
-                //binding.rlBackground.background = BitmapDrawable(this.resources, receipt!!.bitmap)
-                updateUI(receipt)
-            }
-            mLoader.startLoading()
+//            var mLoader = MyAsyncTask(this, data, imageUri, reqCode)
+             firebaseTextDetection(this, data, imageUri, reqCode)
+//            mLoader.registerListener(0) { loader, receipt ->
+//
+//                Log.d("#run", "over")
+//                binding.indeterminateBar.visibility = View.GONE
+//
+//                //binding.rlBackground.background = BitmapDrawable(this.resources, receipt!!.bitmap)
+//                updateUI(receipt)
+//            }
+//            mLoader.startLoading()
 
         } else {
             Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show()
@@ -422,7 +539,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     val imageStream = context.contentResolver.openInputStream(data!!.data!!)
                     bitmap = BitmapFactory.decodeStream(imageStream)
                 }
-                firebaseTextDetection(bitmap)
+//                firebaseTextDetection(bitmap)
                 bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
                 if (bitmap.width > bitmap.height) {
@@ -433,117 +550,100 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     bitmap = Bitmap.createBitmap(scalled, 0, 0, scalled.width, scalled.height, matrix, true)
                 }
 
-
                 bitmap = convevrtToGrayscale(bitmap)
                 bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-
 
                 frame = Frame.Builder().setBitmap(bitmap).build()
                 val items = textRecognizer.detect(frame)
 
-//                var listLength = items.valueAt(items.size() - 1).boundingBox.top
                 listParent = HashMap()
                 val stringBuilder = StringBuilder()
 
-                for (i in 0 until items.size()) {
 
-                    var blockText = items.valueAt(i)
-                    var iterate: Int = blockText.value.split("\n").size
-                    for (zz in 0 until iterate) {
+                val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
+                val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
+                        .onDeviceTextRecognizer
+                val result: Task<FirebaseVisionText> = detector.processImage(image)
+                        .addOnSuccessListener {
+                            val resultText = it.text
+                            for (block in it.textBlocks) {
+                                val blockText = block.text
+                                val blockConfidence = block.confidence
+                                val blockLanguages = block.recognizedLanguages
+                                val blockCornerPoints = block.cornerPoints
+                                val blockFrame = block.boundingBox
+                                for (line in block.lines) {
+                                    val lineText = line.text
 
-                        var item = blockText.components[zz]
-//                        if (item.value.toLowerCase().contains("samaksai eur")) {
-//                            Log.d("#RORGXXZ", "samaksai eur_" + item.boundingBox.top)
-//                        }
-//                        if (item.value.toLowerCase().contains("2,80")) {
-//                            Log.d("#RORGXXZ", "2,80" + item.boundingBox.top)
-//                        }
-                        // for (j in item.components) {
-                        var posTop = item.boundingBox.top
+                                    val lineConfidence = line.confidence
+                                    val lineLanguages = line.recognizedLanguages
+                                    val lineCornerPoints = line.cornerPoints
+                                    val lineFrame = line.boundingBox
+                                    for (element in line.elements) {
+                                        val item = element
 
-                        var array = ArrayList<ModelReceiptData>()
-                        if (listParent.containsKey(posTop)) {
-                            array = listParent[posTop] as ArrayList<ModelReceiptData>
-                        }
-                        var tLeft = item.boundingBox.left
-                        var tTop = item.boundingBox.top
-                        var tRight = item.boundingBox.right
-                        var tBottom = item.boundingBox.bottom
-                        array.add(ModelReceiptData(tLeft, tTop, tRight, tBottom, item.value))
-                        listParent[posTop] = array
-                        Log.d("HEIGHT__", "" + (tBottom - tTop) + "__" + item.value.replace("/n", ""))
-                        // }
+//                                        var item = blockText.components[zz]
+                                        var posTop = item.boundingBox!!.top
+                                        Log.d("#Firebase: ",""+item.text+"_top:"+item.boundingBox!!.top)
+                                        var array = ArrayList<ModelReceiptData>()
+                                        if (listParent.containsKey(posTop)) {
+                                            array = listParent[posTop] as ArrayList<ModelReceiptData>
+                                        }
+                                        var tLeft = item.boundingBox!!.left
+                                        var tTop = item.boundingBox!!.top
+                                        var tRight = item.boundingBox!!.right
+                                        var tBottom = item.boundingBox!!.bottom
+                                        array.add(ModelReceiptData(tLeft, tTop, tRight, tBottom, item.text))
+                                        listParent[posTop] = array
+                                        stringBuilder.append(item.text)
 
-                        stringBuilder.append(item.value)
-                        Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
+                                        if (receipt.receiptIssuer.isEmpty()) {
+                                            receipt.receiptIssuer = gerReceiptIssuer(replaceSpecialChar(item.text.trim()))
+                                        }
 
-                        if (receipt.receiptIssuer.isEmpty()) {
-                            receipt.receiptIssuer = gerReceiptIssuer(replaceSpecialChar(item.value.trim()))
-                        }
-                        /* if (receipt.receiptNo.isEmpty()) {
-                             */
-                        /****set receipt number****//*
-                            var receiptNumber = getReceiptNumber(item.value).trim()
-                            if (!receiptNumber.isEmpty()) {
-                                receipt.receiptNo = receiptNumber
-                            }
-                        }*/
-                        /*if (isReceiptTotal(item.value)) {
-                            */
-                        /****set receipt total****//*
+                                        if (isDateTimePattern(item.text)) {
+                                            receipt.receiptDate = item.text.trim()
+                                        } else if (isDatePattern(item.text)) {
+                                            val receiptTime = replaceSpace(receipt.receiptDate)
+                                            receipt.receiptDate = item.text.trim() + " " + receiptTime
+                                        } else if (isTimePattern(item.text)) {
+                                            val receiptdate = receipt.receiptDate
+                                            receipt.receiptDate = receiptdate + " " + replaceSpace(item.text)
+                                        }
+                                        stringBuilder.append("\n")
 
-                            var strPrevious: String? = items.valueAt(i - 1).value.trim()
-                            var strNext: String? = items.valueAt(i + 1).value.trim()
 
-                            if (isStrNumber(strPrevious)) {
-                                if (isStrNumber(strNext)) {
-                                    var numPrevious: Float? = strToNumber(strPrevious)?.toFloat()
-                                            ?: 0.00f
-                                    var numNext: Float? = strToNumber(strNext)?.toFloat() ?: 0.00f
-                                    if (numPrevious!! > numNext!!) {
-                                        receipt.receiptTotal = strPrevious ?: ""
-                                    } else {
-                                        receipt.receiptTotal = strNext ?: ""
+//                                    Log.d("#Firebase: ",""+elementText)
+                                        val elementConfidence = element.confidence
+                                        val elementLanguages = element.recognizedLanguages
+                                        val elementCornerPoints = element.cornerPoints
+                                        val elementFrame = element.boundingBox
                                     }
-                                } else {
-                                    receipt.receiptTotal = strPrevious ?: ""
                                 }
-                            } else if (i < (items.size() - 1) && isStrNumber(strNext)) {
-                                receipt.receiptTotal = strNext ?: ""
                             }
-                        }*/
-
-
-                        if (isDateTimePattern(item.value)) {
-                            receipt.receiptDate = item.value.trim()
-                        } else if (isDatePattern(item.value)) {
-                            val receiptTime = replaceSpace(receipt.receiptDate)
-                            receipt.receiptDate = item.value.trim() + " " + receiptTime
-                        } else if (isTimePattern(item.value)) {
-                            val receiptdate = receipt.receiptDate
-                            receipt.receiptDate = receiptdate + " " + replaceSpace(item.value)
+                            receipt.receiptFullText = stringBuilder.toString().trim()
                         }
-                        stringBuilder.append("\n")
-                    }
-                }
-                /****set receipt full text****/
-                receipt.receiptFullText = stringBuilder.toString().trim()
-                Log.d("Receipt", "Full Text : " + receipt.receiptFullText)
+                        .addOnFailureListener(
+                                object : OnFailureListener {
+                                    override fun onFailure(p0: java.lang.Exception) {
+                                        Log.d("#Firebase: ","")
+                                    }
+
+                                })
+
+//                    }
+//                }
+
+
             } catch (e: FileNotFoundException) {
                 e.printStackTrace()
-                Log.d("###", "Something went wrong")
+
             }
-            Log.d("#run", "stop")
+
             return ModelAsyncResult(bitmapOverlay, receipt, listParent)
         }
 
-        fun replaceSpecialChar(str: String): String {
-            return str.trim().replace(".:", "").replace(":", "").replace(".", "")
-        }
 
-        fun replaceSpace(str: String): String {
-            return str.trim().replace(" ", "")
-        }
 
         fun createBoundingBox(item: Text) {
             paint.color = Color.RED
@@ -560,47 +660,47 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             canvas.drawText(item.value, item.boundingBox.left.toFloat(), item.boundingBox.top.toFloat(), paint)
             canvasOverlay.drawBitmap(bitmapTemp, Matrix(), null)
         }
-        fun firebaseTextDetection(bitmap:Bitmap){
-
-            val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
-            val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
-                    .onDeviceTextRecognizer
-            val result: Task<FirebaseVisionText> = detector.processImage(image)
-                    .addOnSuccessListener {
-                        val resultText = it.text
-                        for (block in it.textBlocks) {
-                            val blockText = block.text
-                            val blockConfidence = block.confidence
-                            val blockLanguages = block.recognizedLanguages
-                            val blockCornerPoints = block.cornerPoints
-                            val blockFrame = block.boundingBox
-                            for (line in block.lines) {
-                                val lineText = line.text
-                                Log.d("#Firebase: ",""+lineText)
-                                val lineConfidence = line.confidence
-                                val lineLanguages = line.recognizedLanguages
-                                val lineCornerPoints = line.cornerPoints
-                                val lineFrame = line.boundingBox
-                                for (element in line.elements) {
-                                    val elementText = element.text
-//                                    Log.d("#Firebase: ",""+elementText)
-                                    val elementConfidence = element.confidence
-                                    val elementLanguages = element.recognizedLanguages
-                                    val elementCornerPoints = element.cornerPoints
-                                    val elementFrame = element.boundingBox
-                                }
-                            }
-                        }
-                    }
-                    .addOnFailureListener(
-                            object : OnFailureListener {
-                                override fun onFailure(p0: java.lang.Exception) {
-                                    Log.d("#Firebase: ","")
-                                }
-
-                            })
-
-        }
+//        fun firebaseTextDetection(bitmap:Bitmap){
+//
+//            val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
+//            val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
+//                    .onDeviceTextRecognizer
+//            val result: Task<FirebaseVisionText> = detector.processImage(image)
+//                    .addOnSuccessListener {
+//                        val resultText = it.text
+//                        for (block in it.textBlocks) {
+//                            val blockText = block.text
+//                            val blockConfidence = block.confidence
+//                            val blockLanguages = block.recognizedLanguages
+//                            val blockCornerPoints = block.cornerPoints
+//                            val blockFrame = block.boundingBox
+//                            for (line in block.lines) {
+//                                val lineText = line.text
+//                                Log.d("#Firebase: ",""+lineText)
+//                                val lineConfidence = line.confidence
+//                                val lineLanguages = line.recognizedLanguages
+//                                val lineCornerPoints = line.cornerPoints
+//                                val lineFrame = line.boundingBox
+//                                for (element in line.elements) {
+//                                    val elementText = element.text
+////                                    Log.d("#Firebase: ",""+elementText)
+//                                    val elementConfidence = element.confidence
+//                                    val elementLanguages = element.recognizedLanguages
+//                                    val elementCornerPoints = element.cornerPoints
+//                                    val elementFrame = element.boundingBox
+//                                }
+//                            }
+//                        }
+//                    }
+//                    .addOnFailureListener(
+//                            object : OnFailureListener {
+//                                override fun onFailure(p0: java.lang.Exception) {
+//                                    Log.d("#Firebase: ","")
+//                                }
+//
+//                            })
+//
+//        }
 
     }
 

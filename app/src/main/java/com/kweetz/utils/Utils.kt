@@ -50,7 +50,13 @@ fun getCameraUri(context: Context): Uri {
 
 
 }
+fun replaceSpecialChar(str: String): String {
+    return str.trim().replace(".:", "").replace(":", "").replace(".", "")
+}
 
+fun replaceSpace(str: String): String {
+    return str.trim().replace(" ", "")
+}
 fun isStrNumber(str: String?): Boolean {
 
     var num: Number? = null
@@ -188,7 +194,7 @@ fun isReceiptTotal(str: String): Boolean {
     var arry = arrayOf("samaks","samaksai eur", "samaksal eur","kopã apmaksai",  "samaksa1 elr",
             "sanaksai eur", "samaksai elr", "sanaksai elr", "sanaksa","sarnaksai eur", "sarnäsai eur",
             "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur",
-            "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur", "anaks","samaks","amaksa")
+            "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur", "amaks","samak","anaks","samaks","amaksa")
 
     if (str.equals("Samaksal EUR")) {
         Log.d("", "")
