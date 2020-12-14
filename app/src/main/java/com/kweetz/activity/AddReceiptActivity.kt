@@ -13,16 +13,25 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.loader.content.AsyncTaskLoader
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
+import com.google.firebase.FirebaseApp
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.text.FirebaseVisionText
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.kweetz.R
 import com.kweetz.database.model.Receipt
 import com.kweetz.databinding.ActivityAddReceiptBinding
@@ -51,6 +60,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_receipt)
         initialization()
         onClickListener()
@@ -81,7 +91,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         if (result?.bitmap?.width ?: 0 > 0) {
 
             var halfLength = (result!!.bitmap?.width ?: 0) / 2
-            var thirdLength = (result!!.bitmap?.width ?: 0) / 3
+            var thirdLength = (result.bitmap?.width ?: 0) / 3
 
             if (!result.listParent.isNullOrEmpty()) {
                 for (i in result.listParent!!) {
@@ -412,7 +422,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     val imageStream = context.contentResolver.openInputStream(data!!.data!!)
                     bitmap = BitmapFactory.decodeStream(imageStream)
                 }
-
+                firebaseTextDetection(bitmap)
                 bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
                 if (bitmap.width > bitmap.height) {
@@ -426,6 +436,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
                 bitmap = convevrtToGrayscale(bitmap)
                 bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+
 
                 frame = Frame.Builder().setBitmap(bitmap).build()
                 val items = textRecognizer.detect(frame)
@@ -467,7 +478,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         Log.d("#Detected $i", " = " + item.value + " _left:" + item.boundingBox.left + " _right:" + item.boundingBox.right + " _top:" + item.boundingBox.top + " _bottom:" + item.boundingBox.bottom)
 
                         if (receipt.receiptIssuer.isEmpty()) {
-                            receipt.receiptIssuer = gerReceiptIssuer(item.value)
+                            receipt.receiptIssuer = gerReceiptIssuer(replaceSpecialChar(item.value.trim()))
                         }
                         /* if (receipt.receiptNo.isEmpty()) {
                              */
@@ -506,18 +517,13 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         if (isDateTimePattern(item.value)) {
                             receipt.receiptDate = item.value.trim()
                         } else if (isDatePattern(item.value)) {
-
-                            /* if (isTimePattern(receipt.receiptDate)) {
-                                 receiptTime = receipt.receiptDate
-                             }*/
-                            val receiptTime = receipt.receiptDate
+                            val receiptTime = replaceSpace(receipt.receiptDate)
                             receipt.receiptDate = item.value.trim() + " " + receiptTime
                         } else if (isTimePattern(item.value)) {
                             val receiptdate = receipt.receiptDate
-                            receipt.receiptDate = receiptdate + " " + item.value.trim()
+                            receipt.receiptDate = receiptdate + " " + replaceSpace(item.value)
                         }
                         stringBuilder.append("\n")
-                        createBoundingBox(item)
                     }
                 }
                 /****set receipt full text****/
@@ -529,6 +535,14 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             }
             Log.d("#run", "stop")
             return ModelAsyncResult(bitmapOverlay, receipt, listParent)
+        }
+
+        fun replaceSpecialChar(str: String): String {
+            return str.trim().replace(".:", "").replace(":", "").replace(".", "")
+        }
+
+        fun replaceSpace(str: String): String {
+            return str.trim().replace(" ", "")
         }
 
         fun createBoundingBox(item: Text) {
@@ -546,7 +560,51 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             canvas.drawText(item.value, item.boundingBox.left.toFloat(), item.boundingBox.top.toFloat(), paint)
             canvasOverlay.drawBitmap(bitmapTemp, Matrix(), null)
         }
+        fun firebaseTextDetection(bitmap:Bitmap){
 
+            val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
+            val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
+                    .onDeviceTextRecognizer
+            val result: Task<FirebaseVisionText> = detector.processImage(image)
+                    .addOnSuccessListener {
+                        val resultText = it.text
+                        for (block in it.textBlocks) {
+                            val blockText = block.text
+                            val blockConfidence = block.confidence
+                            val blockLanguages = block.recognizedLanguages
+                            val blockCornerPoints = block.cornerPoints
+                            val blockFrame = block.boundingBox
+                            for (line in block.lines) {
+                                val lineText = line.text
+                                Log.d("#Firebase: ",""+lineText)
+                                val lineConfidence = line.confidence
+                                val lineLanguages = line.recognizedLanguages
+                                val lineCornerPoints = line.cornerPoints
+                                val lineFrame = line.boundingBox
+                                for (element in line.elements) {
+                                    val elementText = element.text
+//                                    Log.d("#Firebase: ",""+elementText)
+                                    val elementConfidence = element.confidence
+                                    val elementLanguages = element.recognizedLanguages
+                                    val elementCornerPoints = element.cornerPoints
+                                    val elementFrame = element.boundingBox
+                                }
+                            }
+                        }
+                    }
+                    .addOnFailureListener(
+                            object : OnFailureListener {
+                                override fun onFailure(p0: java.lang.Exception) {
+                                    Log.d("#Firebase: ","")
+                                }
+
+                            })
+
+        }
 
     }
+
+
+
+
 }

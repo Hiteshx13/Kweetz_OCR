@@ -114,11 +114,23 @@ fun isDatePattern(str: String): Boolean {
 
     /**dd.mm.yyyy*/
     val pattern4 = "(?:(.*[0-9]{2}+)\\.) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{4}.*+))"
+    val pattern5 = "(?:(.*[0-9]{2}+)\\,) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{4}.*+))"
+    val pattern6 = "(?:(.*[0-9]{2}+)\\.) ?(?:([0-9]{2}+)\\,) ?(?:([0-9]{4}.*+))"
+    val pattern7 = "(?:(.*[0-9]{2}+)\\,) ?(?:([0-9]{2}+)\\,) ?(?:([0-9]{4}.*+))"
+    val pattern8 = "(?:(.*[0-9]{4}+)\\,) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{2}.*+))"
+    val pattern9 = "(?:(.*[0-9]{4}+)\\.) ?(?:([0-9]{2}+)\\,) ?(?:([0-9]{2}.*+))"
+    val pattern10 = "(?:(.*[0-9]{4}+)\\,) ?(?:([0-9]{2}+)\\,) ?(?:([0-9]{2}.*+))"
 
     return str.matches(Regex(pattern1))
             || str.matches(Regex(pattern2))
             || str.matches(Regex(pattern3))
             || str.matches(Regex(pattern4))
+            || str.matches(Regex(pattern5))
+            || str.matches(Regex(pattern6))
+            || str.matches(Regex(pattern7))
+            || str.matches(Regex(pattern8))
+            || str.matches(Regex(pattern9))
+            || str.matches(Regex(pattern10))
 }
 
 fun isTimePattern(str: String): Boolean {
@@ -173,18 +185,31 @@ fun getReceiptNumber(str: String): String {
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("samaksai eur", "samaksal eur", "kopã apmaksai", "samaks", "samaksa1 elr", "sanaksai eur", "samaksai elr", "sanaksai elr", "sarnaksai eur", "sarnäsai eur", "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur", "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur")
+    var arry = arrayOf("samaks","samaksai eur", "samaksal eur","kopã apmaksai",  "samaksa1 elr",
+            "sanaksai eur", "samaksai elr", "sanaksai elr", "sanaksa","sarnaksai eur", "sarnäsai eur",
+            "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur",
+            "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur", "anaks","samaks","amaksa")
 
-    if (str.equals("Sanaksai EUR")) {
+    if (str.equals("Samaksal EUR")) {
         Log.d("", "")
     }
     var isTotal = false
-    if (arry.contains(str.toLowerCase())) {
-        isTotal = true
+    arry.forEach {
+        if(str.toLowerCase().contains(it)){
+            isTotal = true
+            return isTotal
+        }
     }
+//    if (arry.contains(str.toLowerCase())) {
+//
+//    }
     return isTotal
 }
 
+fun removeAlphabets(str: String):String{
+    var regex=Regex("./[0-9./]")
+    return regex.replace(str,"")
+}
 fun isReceiptDate(strDate: String): Boolean {
     var isDate = false
     var dateFormat1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "252547639365",
+    "project_id": "kweetz-ocr",
+    "storage_bucket": "kweetz-ocr.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:252547639365:android:d73df0ee086a52d5099b2c",
+        "android_client_info": {
+          "package_name": "com.kweetz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "252547639365-3vtaumq1j5l1b3li5a8bv7ntlrtjggrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAuTm97Zx0pvJS9Oh5ZnpWbQppL1RAlaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "252547639365-3vtaumq1j5l1b3li5a8bv7ntlrtjggrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
