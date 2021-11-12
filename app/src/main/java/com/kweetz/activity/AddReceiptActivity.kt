@@ -136,23 +136,18 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             listParent = HashMap()
             val stringBuilder = StringBuilder()
 
+            /** Text recognition from image**/
             val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-
             val image = InputImage.fromBitmap(bitmap, 0)
             val result = recognizer.process(image)
                 .addOnSuccessListener { visionText ->
                     val resultText = visionText.text
                     for (block in visionText.textBlocks) {
                         val blockText = block.text
-//                        val blockConfidence = block.confidence
-//                        val blockLanguages = block.recognizedLanguages
                         val blockCornerPoints = block.cornerPoints
                         val blockFrame = block.boundingBox
                         for (line in block.lines) {
                             val lineText = line.text
-
-//                            val lineConfidence = line.confidence
-//                            val lineLanguages = line.recognizedLanguages
                             val lineCornerPoints = line.cornerPoints
                             val lineFrame = line.boundingBox
                             val item = line
