@@ -1,5 +1,7 @@
 package com.scanlibrary;
 
+import static com.scanlibrary.UtilsFileKt.convevrtToGrayscale;
+
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.ContentResolver;
@@ -258,29 +260,88 @@ public class ScanFragment extends Fragment {
         layoutParams.gravity = Gravity.CENTER;
         polygonView.setLayoutParams(layoutParams);
     }*/
+
+    public static Bitmap convertToBlackWhite(Bitmap bmp) {
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+        int[] pixels = new int[width * height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int alpha = 0xFF << 24; // ?bitmap?24?
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                int grey = pixels[width * i + j];
+
+                int red = ((grey & 0x00FF0000) >> 16);
+                int green = ((grey & 0x0000FF00) >> 8);
+                int blue = (grey & 0x000000FF);
+
+                grey = (int) (red * 0.3 + green * 0.59 + blue * 0.11);
+                grey = alpha | (grey << 16) | (grey << 8) | grey;
+                pixels[width * i + j] = grey;
+            }
+        }
+        Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
+        return newBmp;
+    }
+
+    public static Bitmap createBlackAndWhite(Bitmap src) {
+        int width = src.getWidth();
+        int height = src.getHeight();
+
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        final float factor = 255f;
+        final float redBri = 0.2126f;
+        final float greenBri = 0.2126f;
+        final float blueBri = 0.0722f;
+
+        int length = width * height;
+        int[] inpixels = new int[length];
+        int[] oupixels = new int[length];
+
+        src.getPixels(inpixels, 0, width, 0, 0, width, height);
+
+        int point = 0;
+        for(int pix: inpixels){
+            int R = (pix >> 16) & 0xFF;
+            int G = (pix >> 8) & 0xFF;
+            int B = pix & 0xFF;
+
+            float lum = (redBri * R / factor) + (greenBri * G / factor) + (blueBri * B / factor);
+
+            if (lum > 0.3) {
+                oupixels[point] = 0xFFFFFFFF;
+            }else{
+                oupixels[point] = 0xFF000000;
+            }
+            point++;
+        }
+        bmOut.setPixels(oupixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+
     private void setBitmap() {
 
         if (scaledBitmap == null) {
             scaledBitmap = scaledBitmap(original, sourceFrame.getWidth(), sourceFrame.getHeight());
         }
+        Bitmap bitmapGray = createBlackAndWhite(scaledBitmap);
         sourceImageView.setImageBitmap(scaledBitmap);
-//        if (tempBitmap == null) {
-//            tempBitmap = ((BitmapDrawable) sourceImageView.getDrawable()).getBitmap();
-//        }
-
 
         if (listPoints != null) {
             polygonView.setPointsCoordinates(listPoints);
             int color = getResources().getColor(R.color.orange);
             polygonView.paint.setColor(color);
         } else {
-            pointFs = getEdgePoints(scaledBitmap);
+            pointFs = getEdgePoints(bitmapGray);
             polygonView.setPoints(pointFs);
         }
 
         polygonView.setVisibility(View.VISIBLE);
         int padding = (int) getResources().getDimension(R.dimen.scanPadding);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(scaledBitmap.getWidth() + 2 * padding, scaledBitmap.getHeight() + 2 * padding);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(bitmapGray.getWidth() + 2 * padding, bitmapGray.getHeight() + 2 * padding);
         layoutParams.gravity = Gravity.CENTER;
         polygonView.setLayoutParams(layoutParams);
 
