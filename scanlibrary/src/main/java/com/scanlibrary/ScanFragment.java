@@ -291,7 +291,6 @@ public class ScanFragment extends Fragment {
         int height = src.getHeight();
 
         Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
         final float factor = 255f;
         final float redBri = 0.2126f;
         final float greenBri = 0.2126f;
@@ -327,7 +326,7 @@ public class ScanFragment extends Fragment {
         if (scaledBitmap == null) {
             scaledBitmap = scaledBitmap(original, sourceFrame.getWidth(), sourceFrame.getHeight());
         }
-        Bitmap bitmapGray = createBlackAndWhite(scaledBitmap);
+        Bitmap bitmapBW = createBlackAndWhite(scaledBitmap);
         sourceImageView.setImageBitmap(scaledBitmap);
 
         if (listPoints != null) {
@@ -335,13 +334,12 @@ public class ScanFragment extends Fragment {
             int color = getResources().getColor(R.color.orange);
             polygonView.paint.setColor(color);
         } else {
-            pointFs = getEdgePoints(bitmapGray);
+            pointFs = getEdgePoints(bitmapBW);
             polygonView.setPoints(pointFs);
         }
-
         polygonView.setVisibility(View.VISIBLE);
         int padding = (int) getResources().getDimension(R.dimen.scanPadding);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(bitmapGray.getWidth() + 2 * padding, bitmapGray.getHeight() + 2 * padding);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(bitmapBW.getWidth() + 2 * padding, bitmapBW.getHeight() + 2 * padding);
         layoutParams.gravity = Gravity.CENTER;
         polygonView.setLayoutParams(layoutParams);
 
