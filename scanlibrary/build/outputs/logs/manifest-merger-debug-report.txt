@@ -1,0 +1,105 @@
+-- Merging decision tree log ---
+manifest
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:2:1-51:12
+	package
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:4:5-30
+		INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml
+		INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:3:5-51
+	xmlns:android
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:2:11-69
+uses-sdk
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:5-6:42
+INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:5-6:42
+INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:5-6:42
+INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:5-6:42
+INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:5-6:42
+	android:targetSdkVersion
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:15-44
+		INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml
+		INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml
+	tools:ignore
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:6:9-39
+	android:minSdkVersion
+		INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:5:5-6:42
+		INJECTED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml
+uses-feature#android.hardware.camera
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:7:5-9:35
+	android:required
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:9:9-32
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:8:9-47
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:10:5-81
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:10:22-78
+uses-permission#android.permission.CAMERA
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:12:5-65
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:12:22-62
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:13:5-80
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:13:22-77
+uses-permission#android.permission.MANAGE_EXTERNAL_STORAGE
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:15:5-16:12
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:15:22-79
+uses-permission#androidx.core.content.FileProvider._READ_PERMISSION
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:18:5-91
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:18:22-88
+permission#androidx.core.content.FileProvider._READ_PERMISSION
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:19:5-21:44
+	android:protectionLevel
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:21:9-41
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:20:9-75
+queries
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:22:5-24:15
+package#com.kweetz
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:23:9-46
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:23:18-43
+application
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:25:5-49:19
+	android:requestLegacyExternalStorage
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:28:9-52
+	android:label
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:30:9-41
+	android:hardwareAccelerated
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:29:9-43
+	android:largeHeap
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:27:9-33
+	android:allowBackup
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:26:9-35
+activity#com.scanlibrary.ScanActivity
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:31:9-35:20
+	android:label
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:34:13-45
+	android:configChanges
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:33:13-59
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:32:13-41
+provider#androidx.core.content.FileProvider
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:38:9-47:20
+	android:grantUriPermissions
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:42:13-47
+	android:authorities
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:40:13-54
+	android:exported
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:41:13-37
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:39:13-62
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:43:13-46:95
+	android:resource
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:45:17-55
+	android:readPermission
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:46:17-93
+	android:name
+		ADDED from E:\Android Studio\Workspace\KweetzOCR\scanlibrary\src\main\AndroidManifest.xml:44:17-67

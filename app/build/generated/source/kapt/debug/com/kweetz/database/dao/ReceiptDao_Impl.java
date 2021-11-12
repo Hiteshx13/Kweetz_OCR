@@ -5,30 +5,34 @@ import androidx.room.EntityDeletionOrUpdateAdapter;
 import androidx.room.EntityInsertionAdapter;
 import androidx.room.RoomDatabase;
 import androidx.room.RoomSQLiteQuery;
+import androidx.room.util.CursorUtil;
+import androidx.room.util.DBUtil;
 import androidx.room.util.StringUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
 import com.kweetz.database.model.Receipt;
+import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "deprecation"})
 public final class ReceiptDao_Impl implements ReceiptDao {
   private final RoomDatabase __db;
 
-  private final EntityInsertionAdapter __insertionAdapterOfReceipt;
+  private final EntityInsertionAdapter<Receipt> __insertionAdapterOfReceipt;
 
-  private final EntityDeletionOrUpdateAdapter __deletionAdapterOfReceipt;
+  private final EntityDeletionOrUpdateAdapter<Receipt> __deletionAdapterOfReceipt;
 
   public ReceiptDao_Impl(RoomDatabase __db) {
     this.__db = __db;
     this.__insertionAdapterOfReceipt = new EntityInsertionAdapter<Receipt>(__db) {
       @Override
       public String createQuery() {
-        return "INSERT OR ABORT INTO `Receipt`(`ID`,`ReceiptNo`,`ReceiptDate`,`ReceiptIssuer`,`ReceiptTotal`,`ReceiptDescription`,`ReceiptFullText`) VALUES (nullif(?, 0),?,?,?,?,?,?)";
+        return "INSERT OR ABORT INTO `Receipt` (`ID`,`ReceiptNo`,`ReceiptDate`,`ReceiptIssuer`,`ReceiptTotal`,`ReceiptDescription`,`ReceiptFullText`) VALUES (nullif(?, 0),?,?,?,?,?,?)";
       }
 
       @Override
@@ -80,7 +84,8 @@ public final class ReceiptDao_Impl implements ReceiptDao {
   }
 
   @Override
-  public void insertAll(Receipt... receipts) {
+  public void insertAll(final Receipt... receipts) {
+    __db.assertNotSuspendingTransaction();
     __db.beginTransaction();
     try {
       __insertionAdapterOfReceipt.insert(receipts);
@@ -91,7 +96,8 @@ public final class ReceiptDao_Impl implements ReceiptDao {
   }
 
   @Override
-  public void delete(Receipt receipt) {
+  public void delete(final Receipt receipt) {
+    __db.assertNotSuspendingTransaction();
     __db.beginTransaction();
     try {
       __deletionAdapterOfReceipt.handle(receipt);
@@ -103,34 +109,59 @@ public final class ReceiptDao_Impl implements ReceiptDao {
 
   @Override
   public List<Receipt> getAllReceipts() {
-    final String _sql = "SELECT * FROM Receipt";
+    final String _sql = "SELECT `Receipt`.`ID` AS `ID`, `Receipt`.`ReceiptNo` AS `ReceiptNo`, `Receipt`.`ReceiptDate` AS `ReceiptDate`, `Receipt`.`ReceiptIssuer` AS `ReceiptIssuer`, `Receipt`.`ReceiptTotal` AS `ReceiptTotal`, `Receipt`.`ReceiptDescription` AS `ReceiptDescription`, `Receipt`.`ReceiptFullText` AS `ReceiptFullText` FROM Receipt";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
-    final Cursor _cursor = __db.query(_statement);
+    __db.assertNotSuspendingTransaction();
+    final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
     try {
-      final int _cursorIndexOfID = _cursor.getColumnIndexOrThrow("ID");
-      final int _cursorIndexOfReceiptNo = _cursor.getColumnIndexOrThrow("ReceiptNo");
-      final int _cursorIndexOfReceiptDate = _cursor.getColumnIndexOrThrow("ReceiptDate");
-      final int _cursorIndexOfReceiptIssuer = _cursor.getColumnIndexOrThrow("ReceiptIssuer");
-      final int _cursorIndexOfReceiptTotal = _cursor.getColumnIndexOrThrow("ReceiptTotal");
-      final int _cursorIndexOfReceiptDescription = _cursor.getColumnIndexOrThrow("ReceiptDescription");
-      final int _cursorIndexOfReceiptFullText = _cursor.getColumnIndexOrThrow("ReceiptFullText");
+      final int _cursorIndexOfID = CursorUtil.getColumnIndexOrThrow(_cursor, "ID");
+      final int _cursorIndexOfReceiptNo = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptNo");
+      final int _cursorIndexOfReceiptDate = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptDate");
+      final int _cursorIndexOfReceiptIssuer = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptIssuer");
+      final int _cursorIndexOfReceiptTotal = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptTotal");
+      final int _cursorIndexOfReceiptDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptDescription");
+      final int _cursorIndexOfReceiptFullText = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptFullText");
       final List<Receipt> _result = new ArrayList<Receipt>(_cursor.getCount());
       while(_cursor.moveToNext()) {
         final Receipt _item;
         final int _tmpID;
         _tmpID = _cursor.getInt(_cursorIndexOfID);
         final String _tmpReceiptNo;
-        _tmpReceiptNo = _cursor.getString(_cursorIndexOfReceiptNo);
+        if (_cursor.isNull(_cursorIndexOfReceiptNo)) {
+          _tmpReceiptNo = null;
+        } else {
+          _tmpReceiptNo = _cursor.getString(_cursorIndexOfReceiptNo);
+        }
         final String _tmpReceiptDate;
-        _tmpReceiptDate = _cursor.getString(_cursorIndexOfReceiptDate);
+        if (_cursor.isNull(_cursorIndexOfReceiptDate)) {
+          _tmpReceiptDate = null;
+        } else {
+          _tmpReceiptDate = _cursor.getString(_cursorIndexOfReceiptDate);
+        }
         final String _tmpReceiptIssuer;
-        _tmpReceiptIssuer = _cursor.getString(_cursorIndexOfReceiptIssuer);
+        if (_cursor.isNull(_cursorIndexOfReceiptIssuer)) {
+          _tmpReceiptIssuer = null;
+        } else {
+          _tmpReceiptIssuer = _cursor.getString(_cursorIndexOfReceiptIssuer);
+        }
         final String _tmpReceiptTotal;
-        _tmpReceiptTotal = _cursor.getString(_cursorIndexOfReceiptTotal);
+        if (_cursor.isNull(_cursorIndexOfReceiptTotal)) {
+          _tmpReceiptTotal = null;
+        } else {
+          _tmpReceiptTotal = _cursor.getString(_cursorIndexOfReceiptTotal);
+        }
         final String _tmpReceiptDescription;
-        _tmpReceiptDescription = _cursor.getString(_cursorIndexOfReceiptDescription);
+        if (_cursor.isNull(_cursorIndexOfReceiptDescription)) {
+          _tmpReceiptDescription = null;
+        } else {
+          _tmpReceiptDescription = _cursor.getString(_cursorIndexOfReceiptDescription);
+        }
         final String _tmpReceiptFullText;
-        _tmpReceiptFullText = _cursor.getString(_cursorIndexOfReceiptFullText);
+        if (_cursor.isNull(_cursorIndexOfReceiptFullText)) {
+          _tmpReceiptFullText = null;
+        } else {
+          _tmpReceiptFullText = _cursor.getString(_cursorIndexOfReceiptFullText);
+        }
         _item = new Receipt(_tmpID,_tmpReceiptNo,_tmpReceiptDate,_tmpReceiptIssuer,_tmpReceiptTotal,_tmpReceiptDescription,_tmpReceiptFullText);
         _result.add(_item);
       }
@@ -142,7 +173,7 @@ public final class ReceiptDao_Impl implements ReceiptDao {
   }
 
   @Override
-  public Receipt getReceipt(int... pos) {
+  public Receipt getReceipt(final int... pos) {
     StringBuilder _stringBuilder = StringUtil.newStringBuilder();
     _stringBuilder.append("SELECT * FROM Receipt where ID=");
     final int _inputSize = pos.length;
@@ -155,31 +186,56 @@ public final class ReceiptDao_Impl implements ReceiptDao {
       _statement.bindLong(_argIndex, _item);
       _argIndex ++;
     }
-    final Cursor _cursor = __db.query(_statement);
+    __db.assertNotSuspendingTransaction();
+    final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
     try {
-      final int _cursorIndexOfID = _cursor.getColumnIndexOrThrow("ID");
-      final int _cursorIndexOfReceiptNo = _cursor.getColumnIndexOrThrow("ReceiptNo");
-      final int _cursorIndexOfReceiptDate = _cursor.getColumnIndexOrThrow("ReceiptDate");
-      final int _cursorIndexOfReceiptIssuer = _cursor.getColumnIndexOrThrow("ReceiptIssuer");
-      final int _cursorIndexOfReceiptTotal = _cursor.getColumnIndexOrThrow("ReceiptTotal");
-      final int _cursorIndexOfReceiptDescription = _cursor.getColumnIndexOrThrow("ReceiptDescription");
-      final int _cursorIndexOfReceiptFullText = _cursor.getColumnIndexOrThrow("ReceiptFullText");
+      final int _cursorIndexOfID = CursorUtil.getColumnIndexOrThrow(_cursor, "ID");
+      final int _cursorIndexOfReceiptNo = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptNo");
+      final int _cursorIndexOfReceiptDate = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptDate");
+      final int _cursorIndexOfReceiptIssuer = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptIssuer");
+      final int _cursorIndexOfReceiptTotal = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptTotal");
+      final int _cursorIndexOfReceiptDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptDescription");
+      final int _cursorIndexOfReceiptFullText = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptFullText");
       final Receipt _result;
       if(_cursor.moveToFirst()) {
         final int _tmpID;
         _tmpID = _cursor.getInt(_cursorIndexOfID);
         final String _tmpReceiptNo;
-        _tmpReceiptNo = _cursor.getString(_cursorIndexOfReceiptNo);
+        if (_cursor.isNull(_cursorIndexOfReceiptNo)) {
+          _tmpReceiptNo = null;
+        } else {
+          _tmpReceiptNo = _cursor.getString(_cursorIndexOfReceiptNo);
+        }
         final String _tmpReceiptDate;
-        _tmpReceiptDate = _cursor.getString(_cursorIndexOfReceiptDate);
+        if (_cursor.isNull(_cursorIndexOfReceiptDate)) {
+          _tmpReceiptDate = null;
+        } else {
+          _tmpReceiptDate = _cursor.getString(_cursorIndexOfReceiptDate);
+        }
         final String _tmpReceiptIssuer;
-        _tmpReceiptIssuer = _cursor.getString(_cursorIndexOfReceiptIssuer);
+        if (_cursor.isNull(_cursorIndexOfReceiptIssuer)) {
+          _tmpReceiptIssuer = null;
+        } else {
+          _tmpReceiptIssuer = _cursor.getString(_cursorIndexOfReceiptIssuer);
+        }
         final String _tmpReceiptTotal;
-        _tmpReceiptTotal = _cursor.getString(_cursorIndexOfReceiptTotal);
+        if (_cursor.isNull(_cursorIndexOfReceiptTotal)) {
+          _tmpReceiptTotal = null;
+        } else {
+          _tmpReceiptTotal = _cursor.getString(_cursorIndexOfReceiptTotal);
+        }
         final String _tmpReceiptDescription;
-        _tmpReceiptDescription = _cursor.getString(_cursorIndexOfReceiptDescription);
+        if (_cursor.isNull(_cursorIndexOfReceiptDescription)) {
+          _tmpReceiptDescription = null;
+        } else {
+          _tmpReceiptDescription = _cursor.getString(_cursorIndexOfReceiptDescription);
+        }
         final String _tmpReceiptFullText;
-        _tmpReceiptFullText = _cursor.getString(_cursorIndexOfReceiptFullText);
+        if (_cursor.isNull(_cursorIndexOfReceiptFullText)) {
+          _tmpReceiptFullText = null;
+        } else {
+          _tmpReceiptFullText = _cursor.getString(_cursorIndexOfReceiptFullText);
+        }
         _result = new Receipt(_tmpID,_tmpReceiptNo,_tmpReceiptDate,_tmpReceiptIssuer,_tmpReceiptTotal,_tmpReceiptDescription,_tmpReceiptFullText);
       } else {
         _result = null;
@@ -195,7 +251,8 @@ public final class ReceiptDao_Impl implements ReceiptDao {
   public int getCount() {
     final String _sql = "SELECT COUNT(ID) FROM Receipt";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
-    final Cursor _cursor = __db.query(_statement);
+    __db.assertNotSuspendingTransaction();
+    final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
     try {
       final int _result;
       if(_cursor.moveToFirst()) {
@@ -208,5 +265,9 @@ public final class ReceiptDao_Impl implements ReceiptDao {
       _cursor.close();
       _statement.release();
     }
+  }
+
+  public static List<Class<?>> getRequiredConverters() {
+    return Collections.emptyList();
   }
 }

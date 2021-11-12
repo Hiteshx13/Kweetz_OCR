@@ -1,5 +1,6 @@
 package com.kweetz.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -12,8 +13,10 @@ import com.kweetz.database.AppDatabase
 abstract class BaseActivity:AppCompatActivity() {
 
     lateinit var roomDB: AppDatabase
+    lateinit var mContext: Context
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mContext=this
         roomDB = AppDatabase.getDatabase(applicationContext)
         Log.d("a","")
     }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.scanlibrary" >
+    <uses-sdk android:targetSdkVersion="31"
+        tools:ignore="GradleOverrides" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+         />
+
+    <uses-permission android:name="androidx.core.content.FileProvider._READ_PERMISSION" />
+    <permission
+        android:name="androidx.core.content.FileProvider._READ_PERMISSION"
+        android:protectionLevel="normal" />
+    <queries>
+        <package android:name="com.kweetz" />
+    </queries>
+    <application
+        android:allowBackup="true"
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
+        android:hardwareAccelerated="true"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".ScanActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name" >
+        </activity>
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.kweetz.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"
+                android:readPermission="androidx.core.content.FileProvider._READ_PERMISSION"/>
+        </provider>
+
+    </application>
+
+</manifest>

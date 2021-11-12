@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+const val REQUEST_PHOTO_EDIT = 7338
+
+const val RESULT_DELETED = 358
 fun lounchActivity(context: Context, target: AppCompatActivity) {
     var intent = Intent(context, target::class.java)
     context.startActivity(intent)
@@ -174,11 +177,9 @@ fun gerReceiptIssuer(str: String): String {
 
 fun getReceiptNumber(str: String): String {
 
-    var arry = arrayOf("dok, nr", "dolk. nr", "dolk, nr", "dok. nr", "dok. #", "ceks nr","dok. nir", "ceks", "ceks#", "ceka nr", "dokuments:", "kvits nr", "kvits nr.", "kvits","dox. nr","lok. nr")
-
-    if (str.equals("Dok. Nr. 96/151824 Kase 00001")) {
-        Log.d("", "")
-    }
+    var arry = arrayOf("dok, nr", "dolk. nr", "dolk, nr", "dok. nr", "dok. #",
+            "ceks nr", "dok. nir", "ceks", "ceks#", "ceka nr", "dokuments:", "kvits nr",
+            "kvits nr.", "kvits", "dox. nr", "lok. nr")
     var text = ""
     arry.forEach {
         if (str.toLowerCase().contains(it.toLowerCase())) {
@@ -191,10 +192,10 @@ fun getReceiptNumber(str: String): String {
 }
 
 fun isReceiptTotal(str: String): Boolean {
-    var arry = arrayOf("samaks","samaksai eur", "samaksal eur","kopã apmaksai",  "samaksa1 elr",
-            "sanaksai eur", "samaksai elr", "sanaksai elr", "sanaksa","sarnaksai eur", "sarnäsai eur",
+    var arry = arrayOf("samaks", "samaksai eur", "samaksal eur", "kopã apmaksai", "samaksa1 elr",
+            "sanaksai eur", "samaksai elr", "sanaksai elr", "sanaksa", "sarnaksai eur", "sarnäsai eur",
             "sarnäsaik eur", "kopa apmaksai", "samaksa eur", "kopeja summa apmaksai", "kopsumma eur",
-            "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur", "amaks","samak","anaks","samaks","amaksa")
+            "kopa", "kopa summa", "kopa eur", "kopă eur", "kopå eur", "amaks", "samak", "anaks", "samaks", "amaksa")
 
     if (str.equals("Samaksal EUR")) {
         Log.d("", "")
@@ -214,7 +215,7 @@ fun isReceiptTotal(str: String): Boolean {
 
 fun removeAlphabets(str: String):String{
     var regex=Regex("./[0-9./]")
-    return regex.replace(str,"")
+    return regex.replace(str, "")
 }
 fun isReceiptDate(strDate: String): Boolean {
     var isDate = false

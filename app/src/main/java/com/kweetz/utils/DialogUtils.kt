@@ -16,7 +16,7 @@ fun showReceiptDialog(context: Context, listener: listener.onSelectReceiptListen
     var mDialog = Dialog(context)
     mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
     mDialog.setContentView(R.layout.dialog_select_receipt)
-    mDialog.window.setBackgroundDrawableResource(android.R.color.transparent);
+    mDialog.window?.setBackgroundDrawableResource(android.R.color.transparent);
     val btnRecent: AppCompatButton
     val btnCamera: AppCompatButton
     val btnGallery: AppCompatButton

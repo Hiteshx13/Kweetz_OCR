@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Kweetz OCR</string>
+    <string name="app_name">OCR</string>
     <string name="txt_message">No Text Available</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="receipt_description">Receipt Description</string>
@@ -14,5 +14,6 @@
     <string name="receipt_date">Receipt Date</string>
     <string name="receipt_issuer">Receipt Issuer</string>
     <string name="receipt_total">Receipt Total</string>
+    <string name="images">Images</string>
 
 </resources>
