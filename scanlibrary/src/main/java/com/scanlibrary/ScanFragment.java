@@ -291,7 +291,7 @@ public class ScanFragment extends Fragment {
         int height = src.getHeight();
 
         Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        final float factor = 255f;
+
         final float redBri = 0.2126f;
         final float greenBri = 0.2126f;
         final float blueBri = 0.0722f;
@@ -307,7 +307,7 @@ public class ScanFragment extends Fragment {
             int R = (pix >> 16) & 0xFF;
             int G = (pix >> 8) & 0xFF;
             int B = pix & 0xFF;
-
+            final float factor = 255f;
             float lum = (redBri * R / factor) + (greenBri * G / factor) + (blueBri * B / factor);
 
             if (lum > 0.3) {
