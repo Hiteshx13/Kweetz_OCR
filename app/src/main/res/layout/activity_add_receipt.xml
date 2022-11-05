@@ -244,5 +244,10 @@
                     app:fontFamily="@font/font_fake_receipt" />
             </LinearLayout>
         </LinearLayout>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:id="@+id/icRect"/>
     </RelativeLayout>
 </layout>

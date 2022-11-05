@@ -18,6 +18,7 @@ public class ActivityAddReceiptBindingImpl extends ActivityAddReceiptBinding  {
         sViewsWithIds.put(R.id.indeterminateBar, 7);
         sViewsWithIds.put(R.id.llSave, 8);
         sViewsWithIds.put(R.id.tvSave, 9);
+        sViewsWithIds.put(R.id.icRect, 10);
     }
     // views
     // variables
@@ -26,7 +27,7 @@ public class ActivityAddReceiptBindingImpl extends ActivityAddReceiptBinding  {
     // Inverse Binding Event Handlers
 
     public ActivityAddReceiptBindingImpl(@Nullable androidx.databinding.DataBindingComponent bindingComponent, @NonNull View root) {
-        this(bindingComponent, root, mapBindings(bindingComponent, root, 10, sIncludes, sViewsWithIds));
+        this(bindingComponent, root, mapBindings(bindingComponent, root, 11, sIncludes, sViewsWithIds));
     }
     private ActivityAddReceiptBindingImpl(androidx.databinding.DataBindingComponent bindingComponent, View root, Object[] bindings) {
         super(bindingComponent, root, 0
@@ -35,6 +36,7 @@ public class ActivityAddReceiptBindingImpl extends ActivityAddReceiptBinding  {
             , (androidx.appcompat.widget.AppCompatEditText) bindings[3]
             , (androidx.appcompat.widget.AppCompatEditText) bindings[1]
             , (androidx.appcompat.widget.AppCompatEditText) bindings[4]
+            , (androidx.appcompat.widget.AppCompatImageView) bindings[10]
             , (android.widget.ProgressBar) bindings[7]
             , (android.widget.LinearLayout) bindings[6]
             , (android.widget.LinearLayout) bindings[8]

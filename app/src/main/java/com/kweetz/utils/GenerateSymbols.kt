@@ -1,148 +1,134 @@
 package com.kweetz.utils
 
-import java.util.*
 
-class GenerateSymbols {
-
-
-    /**
-     * You can edit, run, and share this code.
-     * play.kotlinlang.org
-     */
-
-
-    fun main() {
+    fun main(arrayReceiptData:ArrayList<String>):ArrayList<String> {
 
         val regAlphabets = Regex("^[a-zA-Z]*$")
         val regNumber = Regex("^[0-9]*$")
         val regAlphaNum = Regex("^[a-zA-Z0-9]*$")
         val arrayCurrency = arrayOf("$", "¥", "EUR", "GBP", "ZR", "SR")
         val arraySymbols = arrayOf("x", "kg", "g")
-        val ignoreSymbols = arrayOf(".", ",")
-
-        val str = arrayOf(" Appe 1gab $77.55 A","Appe  ds 1gab $7.555 A", "Appegg5k 5k 5 1gab $776.55 A" )
         val regCombo = Regex("^[$0-9.]*$")
-
-        lateinit var sb: StringBuffer
-
-        str.forEach { it ->
-            val strResult = StringBuilder()
-
-            val arrayString = it.trim().split(" ")
-            arrayString.forEach { word ->
-
-                val space = " "
-                strResult.append(space.toString())
+        val arrayResults=ArrayList<String>()
+//        val str =
+//            arrayOf(" Appe 1gab $77.55 A", "Appe  ds 1gab $7.555 A", "Appegg5k 5k 5 1gab $776.55 A")
 
 
-                if (arrayCurrency.contains(word.toString())) {
-                    strResult.append("CURRENCY")
-                } else if (word.toString().matches(regAlphabets) && !arraySymbols.contains(
-                        word.toString().lowercase()
+
+        arrayReceiptData.forEach {
+            val sbResults = StringBuilder()
+            val arrayWords = it.trim().split(" ")
+            arrayWords.forEach { word ->
+
+
+                if (arrayCurrency.contains(word)) {
+                    sbResults.append("CURRENCY")
+                } else if (word.matches(regAlphabets) && !arraySymbols.contains(
+                        word.lowercase()
                     )
                 ) {
-                    strResult.append("STR")
-                } else if (word.toString().matches(regNumber)) {
-                    strResult.append("NUM")
-                } else if (word.toString().matches(regAlphaNum) && !arraySymbols.contains(
-                        word.toString().lowercase()
+                    sbResults.append("STR")
+                } else if (word.matches(regNumber)) {
+                    sbResults.append("NUM")
+                } else if (word.matches(regAlphaNum) && !arraySymbols.contains(
+                        word.lowercase()
                     )
                 ) {
-                    strResult.append("ALPHANUM")
-                } else if (word.toString().matches(regCombo)) {
-                    var tempPettern =StringBuffer()
-                    var current:String=""
-                    word.toString().forEach { chr ->
-                        if (arrayCurrency.contains(chr.toString() )&& !current.equals("CURR")) {
+                    sbResults.append("ALPHANUM")
+                } else if (word.matches(regCombo)) {
+                    val tempPettern = StringBuffer()
+                    var current = ""
+                    word.forEach { chr ->
+                        if (arrayCurrency.contains(chr.toString()) && current != "CURR") {
                             tempPettern.append("CURR")
-                            current="CURR"
-                        } else if (chr.toString().matches(regAlphabets)&&current!="CHR") {
+                            current = "CURR"
+                        } else if (chr.toString().matches(regAlphabets) && current != "CHR") {
                             tempPettern.append("CHR")
-                            current="CHR"
-                        } else if (chr.toString().matches(regNumber)&&current!="NUM") {
+                            current = "CHR"
+                        } else if (chr.toString().matches(regNumber) && current != "NUM") {
                             tempPettern.append("NUM")
-                            current="NUM"
-                        }else if(chr.toString().equals(".")&&current!="SFS"){
+                            current = "NUM"
+                        } else if (chr.toString().equals(".") && current != "SFS") {
                             tempPettern.append("SFS")
-                            current="SFS"
-                        }else if(chr.toString().equals(",")&&current!="SC"){
+                            current = "SFS"
+                        } else if (chr.toString().equals(",") && current != "SC") {
                             tempPettern.append("SC")
-                            current="SC"
+                            current = "SC"
                         }
 
                     }
-                    strResult.append(tempPettern.toString())
-                }
+                    sbResults.append(tempPettern.toString())
+                } else {
 
-                else {
-                    sb = StringBuffer()
-                    word.toString().forEach { chr ->
+                    word.forEach { chr ->
 
-
-                        if (chr.toString().matches(regAlphabets) && arraySymbols.contains(
+                        if (chr.toString().matches(regAlphabets) && !arraySymbols.contains(
                                 chr.toString().lowercase()
-                            ) == false
+                            )
                         ) {
-                            strResult.append("CHR")
+                            sbResults.append("CHR")
 
                         } else if (chr.toString().matches(regNumber)) {
-                            strResult.append("NUM")
+                            sbResults.append("NUM")
                         } else {
 
 
                             when (chr.toString()) {
                                 "$" -> {
-                                    strResult.append("CURRENCY")
+                                    sbResults.append("CURRENCY")
                                 }
                                 ":" -> {
-                                    strResult.append("SCO")
+                                    sbResults.append("SCO")
                                 }
 
                                 "." -> {
-                                    strResult.append("SFS")
+                                    sbResults.append("SFS")
                                 }
                                 "," -> {
-                                    strResult.append("SC")
+                                    sbResults.append("SC")
                                 }
 
                                 "(" -> {
-                                    strResult.append("SPS")
+                                    sbResults.append("SPS")
                                 }
                                 ")" -> {
-                                    strResult.append("SPE")
+                                    sbResults.append("SPE")
                                 }
                                 "-" -> {
-                                    strResult.append("SH")
+                                    sbResults.append("SH")
                                 }
                                 "%" -> {
-                                    strResult.append("QSP")
+                                    sbResults.append("QSP")
                                 }
                                 "/" -> {
-                                    strResult.append("QSS")
+                                    sbResults.append("QSS")
                                 }
                                 "kg" -> {
-                                    strResult.append("QSKG")
+                                    sbResults.append("QSKG")
                                 }
-
 
                                 "pc" -> {
-                                    strResult.append("QSPC")
+                                    sbResults.append("QSPC")
                                 }
                                 "X" -> {
-                                    strResult.append("QSMX")
+                                    sbResults.append("QSMX")
                                 }
                                 "*" -> {
-                                    strResult.append("QSMS")
+                                    sbResults.append("QSMS")
                                 }
 
                             }
                         }
                     }
                 }
+
+                sbResults.append(" ")
+
             }
-            println(strResult)
+            println(sbResults)
+            arrayResults.add(sbResults.toString())
         }
 
+        return arrayResults
     }
 
-}
