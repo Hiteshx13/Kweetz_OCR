@@ -103,11 +103,7 @@ fun isDateTimePattern(str: String): Boolean {
     /**dd.mm.yyyy hh:mm:ss*/
     val pattern4 = "(?:(.*[0-9]{2}+)\\.) ?(?:([0-9]{2}+)\\.) ?(?:([0-9]{4}+)) ?(?:([0-9]{2}+):)?(?:([0-9]{2}+):) ?(?:([0-9]{2}.*+))"
 
-
-    return str.matches(Regex(pattern1))
-            || str.matches(Regex(pattern2))
-            || str.matches(Regex(pattern3))
-            || str.matches(Regex(pattern4))
+    return str.matches(Regex(pattern1))|| str.matches(Regex(pattern2)) || str.matches(Regex(pattern3)) || str.matches(Regex(pattern4))
 }
 
 fun isDatePattern(str: String): Boolean {
