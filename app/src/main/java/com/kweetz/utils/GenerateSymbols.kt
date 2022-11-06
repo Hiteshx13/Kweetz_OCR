@@ -1,7 +1,7 @@
 package com.kweetz.utils
 
 
-    fun main(arrayReceiptData:ArrayList<String>):ArrayList<String> {
+    fun getSymbolicString(textLine:String):String {
 
         val regAlphabets = Regex("^[a-zA-Z]*$")
         val regNumber = Regex("^[0-9]*$")
@@ -9,15 +9,13 @@ package com.kweetz.utils
         val arrayCurrency = arrayOf("$", "¥", "EUR", "GBP", "ZR", "SR")
         val arraySymbols = arrayOf("x", "kg", "g")
         val regCombo = Regex("^[$0-9.]*$")
-        val arrayResults=ArrayList<String>()
+//        val arrayResults=ArrayList<String>()
 //        val str =
 //            arrayOf(" Appe 1gab $77.55 A", "Appe  ds 1gab $7.555 A", "Appegg5k 5k 5 1gab $776.55 A")
 
 
-
-        arrayReceiptData.forEach {
             val sbResults = StringBuilder()
-            val arrayWords = it.trim().split(" ")
+            val arrayWords = textLine.trim().split(" ")
             arrayWords.forEach { word ->
 
 
@@ -126,9 +124,9 @@ package com.kweetz.utils
 
             }
             println(sbResults)
-            arrayResults.add(sbResults.toString())
-        }
+//            arrayResults.add(sbResults.toString())
 
-        return arrayResults
+
+        return sbResults.toString()
     }
 

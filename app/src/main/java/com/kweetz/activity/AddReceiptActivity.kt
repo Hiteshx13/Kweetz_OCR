@@ -28,7 +28,7 @@ import com.kweetz.model.ModelAsyncResult
 import com.kweetz.model.ModelReceiptData
 import com.kweetz.utils.*
 import com.scanlibrary.ScanActivity
-import java.io.FileNotFoundException
+import java.io.*
 
 
 class AddReceiptActivity : BaseActivity(), View.OnClickListener {
@@ -155,7 +155,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     val resultText = visionText.text
                     val arrayLeft = HashMap<Int, ModelReceiptData>()
                     val arrayRight = HashMap<Int, ModelReceiptData>()
-                    var thirdLength = (bitmapOriginal.width ?: 0) / 3
+                    var thirdLength = bitmapOriginal.width / 3
 
 
                     for (block in visionText.textBlocks) {
@@ -173,21 +173,26 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                             var tBottom = line.boundingBox!!.bottom
 
 
-                            val model= ModelReceiptData(
+                            val symbolicString = getSymbolicString(line.text)
+                            val model = ModelReceiptData(
                                 tLeft,
                                 tTop,
                                 tRight,
                                 tBottom,
-                                line.text
+                                line.text,
+                                symbolicString
                             )
+
+
                             if (tLeft <= thirdLength) {
                                 arrayLeft[tTop] = model
-                                Log.d("#DATA_LEFT",""+line.text)
+                                Log.d("#DATA_LEFT", "" + line.text)
+
                             } else {
                                 arrayRight[tTop] = model
-                                Log.d("#DATA_RIGHT",""+line.text)
+                                Log.d("#DATA_RIGHT", "" + line.text)
                             }
-
+                            Log.d("#DATA_SYMMBOLIC", "" + symbolicString)
 
 
 //                            listParent.add()
@@ -235,7 +240,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
 
                     receipt.receiptFullText = stringBuilder.toString().trim()
-                    updateUI(ModelAsyncResult(bitmapOriginal, receipt, arrayLeft,arrayRight))
+                    updateUI(ModelAsyncResult(bitmapOriginal, receipt, arrayLeft, arrayRight))
 
                 }
                 .addOnFailureListener { e ->
@@ -317,17 +322,18 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     fun createBoundingBox(item: Rect, type: Int) {
 
-        when(type){
-            1->{
+        when (type) {
+            1 -> {
                 paint.color = Color.RED
-                paint.strokeWidth = 10f
+                paint.strokeWidth = 20f
             }
-            2->{
+            2 -> {
                 paint.color = Color.BLUE
-                paint.strokeWidth = 6f
-            }3->{
-            paint.color = Color.GREEN
-            paint.strokeWidth = 4f
+                paint.strokeWidth = 12f
+            }
+            3 -> {
+                paint.color = Color.GREEN
+                paint.strokeWidth = 4f
             }
         }
 
@@ -361,11 +367,18 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         val modelOld: ModelReceiptData = result.arrayLeft[j]!!
                         val modelNew = ModelReceiptData(
                             modelOld.left, modelOld.top, modelRight.right, modelRight.bottom,
-                            modelOld.text + " " + modelRight.text
-
+                            modelOld.text + " " + modelRight.text,
+                            modelOld.symbols + " " + modelRight.symbols
                         )
-                        createBoundingBox(Rect( modelOld.left, modelOld.top, modelRight.right, modelRight.bottom),2)
-                        Log.d("#DATA_MERGED",""+modelOld.text + " " + modelRight.text)
+                        createBoundingBox(
+                            Rect(
+                                modelOld.left,
+                                modelOld.top,
+                                modelRight.right,
+                                modelRight.bottom
+                            ), 2
+                        )
+                        Log.d("#DATA_MERGED", "" + modelOld.text + " " + modelRight.text)
 
                         result.arrayLeft[j] = modelNew
                         isMerged = true
@@ -505,7 +518,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 //            }
 //        }
 
-        var receipt = result?.receipt
+        var receipt = result.receipt
         binding.model = receipt
         binding.notifyChange()
         binding.indeterminateBar.visibility = View.GONE
@@ -937,4 +950,44 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 //    }
 
 
+    fun readAssetsFile() {
+        val arraySymbols = ArrayList<String>()
+        val inputStream: InputStream = assets.open("testtext.txt")
+        var reader: BufferedReader? = null
+        try {
+            reader = BufferedReader(
+                InputStreamReader(assets.open("testtext.txt"))
+            )
+
+            // do reading, usually loop until end of file reading
+            val mLine = ""
+            reader.readLines().forEach {
+                if (it.trim().isNotEmpty()&&it!=",") {
+                    val symbols = getSymbolicString(it)
+                    arraySymbols.add(symbols)
+                    Log.d("###LINES", "" + symbols)
+                }
+
+            }
+
+            Log.d("###LINES", "" + arraySymbols.size)
+
+        } catch (e: IOException) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close()
+                } catch (e: IOException) {
+                    //log the exception
+                }
+            }
+        }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        readAssetsFile()
+    }
 }

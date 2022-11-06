@@ -98,7 +98,9 @@ dependencies {
     // optional - RxJava support for Room
     implementation "androidx.room:room-rxjava2:2.3.0"
     implementation "com.android.support:design:31.0.0"
-
+    //Read XLS file
+    //implementation("org.apache.poi:poi:3.10")
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
 }
 repositories {
     mavenCentral()
