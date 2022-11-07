@@ -357,7 +357,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
             result.arrayRight.forEach {
                 val modelRight = it.value
-                var height: Int = (modelRight.bottom - modelRight.top)
+                var height: Int = (modelRight.bottom!! - modelRight.top!!)
                 var min = modelRight.top - (height / 2)
                 var max = modelRight.bottom + (height / 2)
 
@@ -372,9 +372,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         )
                         createBoundingBox(
                             Rect(
-                                modelOld.left,
-                                modelOld.top,
-                                modelRight.right,
+                                modelOld.left!!,
+                                modelOld.top!!,
+                                modelRight.right!!,
                                 modelRight.bottom
                             ), 2
                         )
@@ -401,7 +401,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             binding.icRect.setImageBitmap(bmpMerged)
 
 
-            calculatePercentage(result.arrayLeft)
 //            result.arrayLeft.forEach{
 //                val model:ModelReceiptData=it.value
 //
@@ -538,7 +537,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
         for((i,value) in  data){
             val modelI=value
-            val arrReversedI = modelI!!.symbols.split(" ").toTypedArray()
+            val arrReversedI = modelI!!.symbols.trim().split(" ").toTypedArray()
 
             // iterating string array
             var wordsI=""
@@ -548,18 +547,16 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
                 //comparing symbols in other string
                 for((k,value) in  data){
-
-
                     if(k!=i){
-
                         val modelK=data[k]
-                        val arrReversedK = modelK!!.symbols.split(" ").toTypedArray()
+                        val arrReversedK = modelK!!.symbols.trim().split(" ").toTypedArray()
 
                         var wordsK=""
                         for(kr in arrReversedK.size-1 downTo 0){
                             wordsK +=arrReversedK[kr]+" "
                             if(wordsI==wordsK){
-                                map[i]= wordsK
+                               // map[i]= wordsK
+                                map[i]= wordsK + (((arrReversedK.size-kr)*100)/arrReversedK.size)
                                 //println("Matched: "+k+"_"+wordsI+"___"+wordsK)
 
                             }else{
@@ -577,13 +574,19 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
         }
 
+        /*
+        *  arrayPatternSymbols[20]=ModelReceiptData(symb = "a b c d e ")
+        arrayPatternSymbols[40]=ModelReceiptData(symbols = "b b c d e ")
+        arrayPatternSymbols[60]=ModelReceiptData(symbols = "c d c d e ")
+        arrayPatternSymbols[80]=ModelReceiptData(symbols = "e f g d e ")
+        arrayPatternSymbols[50]=ModelReceiptData(symbols = "z b c d e ")*/
         map.forEach{
 
             //val arrReversedK = "A B C".split(" ").toTypedArray()
             val mainStr=data[it.key]!!.symbols
             val cursor=it.value
 //            val subStr=mainStr.substring((mainStr.length-it.value),mainStr.length)
-            println("Main: key "+it.key+" = "+it.value+": ")
+            println("Main: key "+it.key+" = "+it.value+"")
 //         arrReversedK.forEach{ char->
 //             println("Main: "+it.key+" "+char)
 //         }
@@ -1054,6 +1057,16 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+        val arrayPatternSymbols = HashMap<Int,ModelReceiptData>()
+
+        arrayPatternSymbols[20]=ModelReceiptData(symbols = "a b c d e ")
+        arrayPatternSymbols[40]=ModelReceiptData(symbols = "b b c d e ")
+        arrayPatternSymbols[60]=ModelReceiptData(symbols = "c d c d e ")
+        arrayPatternSymbols[80]=ModelReceiptData(symbols = "e f g d e ")
+        arrayPatternSymbols[50]=ModelReceiptData(symbols = "z b c d e ")
+        calculatePercentage(arrayPatternSymbols)
+
+
       //  readAssetsFile()
     }
 }

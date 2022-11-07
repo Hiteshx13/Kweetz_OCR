@@ -1,10 +1,10 @@
 package com.kweetz.model
 
 data class ModelReceiptData(
-    val left: Int,
-    val top: Int,
-    val right: Int,
-    val bottom: Int,
-    val text: String,
+    val left: Int?=null,
+    val top: Int?=null,
+    val right: Int?=null,
+    val bottom: Int?=null,
+    val text: String="",
     val symbols:String
 )
