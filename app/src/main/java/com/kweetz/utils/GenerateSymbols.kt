@@ -33,9 +33,9 @@ fun getSymbolicString(textLine: String): String {
             val tempPettern = StringBuffer()
             var current = ""
             word.forEach { chr ->
-                if (arrayCurrency.contains(chr.toString()) && current != "CURR") {
-                    tempPettern.append("CURR")
-                    current = "CURR"
+                if (arrayCurrency.contains(chr.toString()) && current != "CURRENCY") {
+                    tempPettern.append("CURRENCY")
+                    current = "CURRENCY"
                 } else if (chr.toString().matches(regAlphabets) && current != "CHR") {
                     tempPettern.append("CHR")
                     current = "CHR"

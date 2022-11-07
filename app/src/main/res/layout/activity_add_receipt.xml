@@ -13,14 +13,47 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_launcher"
+            android:id="@+id/icRect"/>
         <LinearLayout
+            android:id="@+id/llAutoFill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp5"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/dp30"
+            android:background="@drawable/shape_border_black_filled"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/dp5">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Auto fill-In"
+                android:textColor="@color/colorPrimaryDark"
+                app:fontFamily="@font/font_fake_receipt" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:rotation="125"
+                android:src="@drawable/ic_attachment_black_24dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="@dimen/dp10">
 
             <LinearLayout
-                android:id="@+id/llAutoFill"
+                android:id="@+id/llAutoFill1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp5"
@@ -244,10 +277,6 @@
                     app:fontFamily="@font/font_fake_receipt" />
             </LinearLayout>
         </LinearLayout>
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:id="@+id/icRect"/>
+
     </RelativeLayout>
 </layout>

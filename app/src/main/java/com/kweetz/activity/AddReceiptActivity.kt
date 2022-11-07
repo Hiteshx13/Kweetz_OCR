@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -175,7 +176,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
                             val symbolicString = getSymbolicString(line.text)
                             val model = ModelReceiptData(
-                                tLeft,
+                                0,
+                                 tLeft,
                                 tTop,
                                 tRight,
                                 tBottom,
@@ -351,7 +353,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     fun updateUI(result: ModelAsyncResult?) {
 
         binding.model = result?.receipt
-        binding.notifyChange()
+        //binding.notifyChange()
         if (result!!.bitmap?.width ?: 0 > 0) {
 
 
@@ -366,18 +368,19 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     if (result.arrayLeft.containsKey(j)) {
                         val modelOld: ModelReceiptData = result.arrayLeft[j]!!
                         val modelNew = ModelReceiptData(
+                            0,
                             modelOld.left, modelOld.top, modelRight.right, modelRight.bottom,
                             modelOld.text + " " + modelRight.text,
                             modelOld.symbols + " " + modelRight.symbols
                         )
-                        createBoundingBox(
-                            Rect(
-                                modelOld.left!!,
-                                modelOld.top!!,
-                                modelRight.right!!,
-                                modelRight.bottom
-                            ), 2
-                        )
+//                        createBoundingBox(
+//                            Rect(
+//                                modelOld.left!!,
+//                                modelOld.top!!,
+//                                modelRight.right!!,
+//                                modelRight.bottom
+//                            ), 2
+//                        )
                         Log.d("#DATA_MERGED", "" + modelOld.text + " " + modelRight.text)
 
                         result.arrayLeft[j] = modelNew
@@ -389,18 +392,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 }
             }
 
-            val bmpMerged = Bitmap.createBitmap(
-                bitmapOriginal.width,
-                bitmapOriginal.height,
-                bitmapOriginal.config
-            )
-            val canvas = Canvas(bmpMerged)
-            canvas.drawBitmap(bitmapOriginal, Matrix(), null)
-            canvas.drawBitmap(bitmapOverlay, Matrix(), null)
-
-            binding.icRect.setImageBitmap(bmpMerged)
 
 
+            calculatePercentage(result.arrayLeft)
 //            result.arrayLeft.forEach{
 //                val model:ModelReceiptData=it.value
 //
@@ -532,7 +526,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun calculatePercentage(data:HashMap<Int, ModelReceiptData>){
-        val map=HashMap<Int,String>()
+        val map=HashMap<Int,ModelReceiptData>()
 
 
         for((i,value) in  data){
@@ -556,7 +550,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                             wordsK +=arrReversedK[kr]+" "
                             if(wordsI==wordsK){
                                // map[i]= wordsK
-                                map[i]= wordsK + (((arrReversedK.size-kr)*100)/arrReversedK.size)
+                                modelI.percentageOfMatch=(((arrReversedK.size-kr)*100)/arrReversedK.size)
+                                map[i]= modelI
                                 //println("Matched: "+k+"_"+wordsI+"___"+wordsK)
 
                             }else{
@@ -574,25 +569,38 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
         }
 
-        /*
-        *  arrayPatternSymbols[20]=ModelReceiptData(symb = "a b c d e ")
-        arrayPatternSymbols[40]=ModelReceiptData(symbols = "b b c d e ")
-        arrayPatternSymbols[60]=ModelReceiptData(symbols = "c d c d e ")
-        arrayPatternSymbols[80]=ModelReceiptData(symbols = "e f g d e ")
-        arrayPatternSymbols[50]=ModelReceiptData(symbols = "z b c d e ")*/
         map.forEach{
-
-            //val arrReversedK = "A B C".split(" ").toTypedArray()
-            val mainStr=data[it.key]!!.symbols
-            val cursor=it.value
-//            val subStr=mainStr.substring((mainStr.length-it.value),mainStr.length)
-            println("Main: key "+it.key+" = "+it.value+"")
-//         arrReversedK.forEach{ char->
-//             println("Main: "+it.key+" "+char)
-//         }
-
+        val model=it.value
+            createBoundingBox(
+                Rect(
+                    model.left!!,
+                    model.top!!,
+                    model.right!!,
+                    model.bottom!!
+                ), 2
+            )
+            println("Main: key "+it.key+" = "+it.value.text+"   "+it.value.percentageOfMatch)
         }
+        postProcess()
     }
+
+
+    private fun postProcess(){
+
+        val bmpMerged = Bitmap.createBitmap(
+            bitmapOriginal.width,
+            bitmapOriginal.height,
+            bitmapOriginal.config
+        )
+        val canvas = Canvas(bmpMerged)
+        canvas.drawBitmap(bitmapOriginal, Matrix(), null)
+        canvas.drawBitmap(bitmapOverlay, Matrix(), null)
+
+        val bmp=Bitmap.createScaledBitmap(bmpMerged,300,600,false)
+        binding.icRect.setImageBitmap(bmp)
+        Toast.makeText(this,"Done..!",Toast.LENGTH_LONG).show()
+    }
+
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.llSave -> {
@@ -1057,14 +1065,14 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        val arrayPatternSymbols = HashMap<Int,ModelReceiptData>()
+     //   val arrayPatternSymbols = HashMap<Int,ModelReceiptData>()
 
-        arrayPatternSymbols[20]=ModelReceiptData(symbols = "a b c d e ")
-        arrayPatternSymbols[40]=ModelReceiptData(symbols = "b b c d e ")
-        arrayPatternSymbols[60]=ModelReceiptData(symbols = "c d c d e ")
-        arrayPatternSymbols[80]=ModelReceiptData(symbols = "e f g d e ")
-        arrayPatternSymbols[50]=ModelReceiptData(symbols = "z b c d e ")
-        calculatePercentage(arrayPatternSymbols)
+//        arrayPatternSymbols[20]=ModelReceiptData(symbols = "a b c d e ")
+//        arrayPatternSymbols[40]=ModelReceiptData(symbols = "b b c d e ")
+//        arrayPatternSymbols[60]=ModelReceiptData(symbols = "c d c d e ")
+//        arrayPatternSymbols[80]=ModelReceiptData(symbols = "e f g d e ")
+//        arrayPatternSymbols[50]=ModelReceiptData(symbols = "z b c d e ")
+//        calculatePercentage(arrayPatternSymbols)
 
 
       //  readAssetsFile()
