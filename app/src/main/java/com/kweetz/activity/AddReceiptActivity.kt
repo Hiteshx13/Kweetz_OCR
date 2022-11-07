@@ -389,11 +389,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 }
             }
 
-//            result.arrayLeft.forEach{
-//                val model=it.value
-//                createBoundingBox(Rect(model.left,model.top,model.right,model.bottom),3)
-//            }
-
             val bmpMerged = Bitmap.createBitmap(
                 bitmapOriginal.width,
                 bitmapOriginal.height,
@@ -404,6 +399,18 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             canvas.drawBitmap(bitmapOverlay, Matrix(), null)
 
             binding.icRect.setImageBitmap(bmpMerged)
+
+
+            calculatePercentage(result.arrayLeft)
+//            result.arrayLeft.forEach{
+//                val model:ModelReceiptData=it.value
+//
+//
+//
+//            }
+
+
+
 
 //            if (!result.listParent.isNullOrEmpty()) {
 //                for (i in result.listParent!!) {
@@ -477,6 +484,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 //            }
         }
 
+
 //        for (i in listTemp) {
 //            Log.d("#merged ",""+i.value)
 //            var array = i.value as ArrayList<ModelReceiptData>
@@ -524,7 +532,64 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         binding.indeterminateBar.visibility = View.GONE
     }
 
+    private fun calculatePercentage(data:HashMap<Int, ModelReceiptData>){
+        val map=HashMap<Int,String>()
 
+
+        for((i,value) in  data){
+            val modelI=value
+            val arrReversedI = modelI!!.symbols.split(" ").toTypedArray()
+
+            // iterating string array
+            var wordsI=""
+            var pointer=0
+            for(j in arrReversedI.size-1 downTo 0){
+                wordsI+= arrReversedI[j]+" "
+
+                //comparing symbols in other string
+                for((k,value) in  data){
+
+
+                    if(k!=i){
+
+                        val modelK=data[k]
+                        val arrReversedK = modelK!!.symbols.split(" ").toTypedArray()
+
+                        var wordsK=""
+                        for(kr in arrReversedK.size-1 downTo 0){
+                            wordsK +=arrReversedK[kr]+" "
+                            if(wordsI==wordsK){
+                                map[i]= wordsK
+                                //println("Matched: "+k+"_"+wordsI+"___"+wordsK)
+
+                            }else{
+                                pointer=k+1
+                                // println("Not Matched: "+k+"_"+wordsI+"___"+wordsK)
+
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+
+        map.forEach{
+
+            //val arrReversedK = "A B C".split(" ").toTypedArray()
+            val mainStr=data[it.key]!!.symbols
+            val cursor=it.value
+//            val subStr=mainStr.substring((mainStr.length-it.value),mainStr.length)
+            println("Main: key "+it.key+" = "+it.value+": ")
+//         arrReversedK.forEach{ char->
+//             println("Main: "+it.key+" "+char)
+//         }
+
+        }
+    }
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.llSave -> {
@@ -989,6 +1054,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        readAssetsFile()
+      //  readAssetsFile()
     }
 }
