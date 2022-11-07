@@ -954,6 +954,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         val arraySymbols = ArrayList<String>()
         val inputStream: InputStream = assets.open("testtext.txt")
         var reader: BufferedReader? = null
+        val sb=StringBuilder()
         try {
             reader = BufferedReader(
                 InputStreamReader(assets.open("testtext.txt"))
@@ -965,11 +966,11 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 if (it.trim().isNotEmpty()&&it!=",") {
                     val symbols = getSymbolicString(it)
                     arraySymbols.add(symbols)
-                    Log.d("###LINES", "" + symbols)
+                    sb.append("$symbols, \n")
                 }
 
             }
-
+            Log.d("###LINES", "" + sb.toString().replace(",","\n"))
             Log.d("###LINES", "" + arraySymbols.size)
 
         } catch (e: IOException) {
