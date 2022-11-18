@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -156,14 +155,14 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     val resultText = visionText.text
                     val arrayLeft = HashMap<Int, ModelReceiptData>()
                     val arrayRight = HashMap<Int, ModelReceiptData>()
-                    var thirdLength = bitmapOriginal.width / 3
+                    var splitLength = bitmapOriginal.width / 2
 
 
                     for (block in visionText.textBlocks) {
                         val blockText = block.text
                         val blockCornerPoints = block.cornerPoints
                         val blockFrame = block.boundingBox
-                        // createBoundingBox(blockFrame!!,0)
+                        //createBoundingBox(blockFrame!!,1)
 
 
                         for (line in block.lines) {
@@ -177,7 +176,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                             val symbolicString = getSymbolicString(line.text)
                             val model = ModelReceiptData(
                                 0,
-                                 tLeft,
+                                tLeft,
                                 tTop,
                                 tRight,
                                 tBottom,
@@ -186,7 +185,8 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                             )
 
 
-                            if (tLeft <= thirdLength) {
+                            if (tLeft <= splitLength) {
+
                                 arrayLeft[tTop] = model
                                 Log.d("#DATA_LEFT", "" + line.text)
 
@@ -194,7 +194,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                                 arrayRight[tTop] = model
                                 Log.d("#DATA_RIGHT", "" + line.text)
                             }
-                            Log.d("#DATA_SYMMBOLIC", "" + symbolicString)
+                            // Log.d("#DATA_SYMMBOLIC", "" + symbolicString)
 
 
 //                            listParent.add()
@@ -327,11 +327,11 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         when (type) {
             1 -> {
                 paint.color = Color.RED
-                paint.strokeWidth = 20f
+                paint.strokeWidth = 10f
             }
             2 -> {
                 paint.color = Color.BLUE
-                paint.strokeWidth = 12f
+                paint.strokeWidth = 6f
             }
             3 -> {
                 paint.color = Color.GREEN
@@ -350,8 +350,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         canvasOverlay.drawBitmap(bitmapTemp, Matrix(), null)
     }
 
-    fun updateUI(result: ModelAsyncResult?) {
 
+    fun updateUI(result: ModelAsyncResult?) {
+        //var arrayCombined = HashMap<Int, ModelReceiptData>()
         binding.model = result?.receipt
         //binding.notifyChange()
         if (result!!.bitmap?.width ?: 0 > 0) {
@@ -360,36 +361,58 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             result.arrayRight.forEach {
                 val modelRight = it.value
                 var height: Int = (modelRight.bottom!! - modelRight.top!!)
-                var min = modelRight.top - (height / 2)
-                var max = modelRight.bottom + (height / 2)
-
+                var min = modelRight.top!! - (height / 2)
+                var max = modelRight.bottom!! + (height / 2)
+                Log.d("#DATA_RIGHT", "" + modelRight.text)
+                Log.d("MERGING", "_START...")
                 var isMerged = false
+                var modelMerge = ModelReceiptData()
                 for (j in min..max) {
-                    if (result.arrayLeft.containsKey(j)) {
-                        val modelOld: ModelReceiptData = result.arrayLeft[j]!!
-                        val modelNew = ModelReceiptData(
-                            0,
-                            modelOld.left, modelOld.top, modelRight.right, modelRight.bottom,
-                            modelOld.text + " " + modelRight.text,
-                            modelOld.symbols + " " + modelRight.symbols
-                        )
-//                        createBoundingBox(
-//                            Rect(
-//                                modelOld.left!!,
-//                                modelOld.top!!,
-//                                modelRight.right!!,
-//                                modelRight.bottom
-//                            ), 2
-//                        )
-                        Log.d("#DATA_MERGED", "" + modelOld.text + " " + modelRight.text)
 
-                        result.arrayLeft[j] = modelNew
+                    if (result.arrayLeft.containsKey(j)) {
+                        val modelJ = result.arrayLeft[j]
+
+                        if (modelMerge.left == null || modelMerge.left ?: 0 > modelJ?.left ?: 0) {
+                            modelMerge.left = modelJ?.left
+                            modelMerge.top = modelJ?.top
+                        }
+
+                        modelMerge.right = modelJ?.right
+                        modelMerge.bottom = modelJ?.bottom
+                        modelMerge.text = modelMerge.text + " " + modelJ?.text
+                        modelMerge.symbols = modelMerge.symbols + " " + modelJ?.symbols
+                        //result.arrayLeft.remove(j)
+                        // val modelOld: ModelReceiptData = result.arrayLeft[j]!!
+
                         isMerged = true
                     }
                 }
-                if (!isMerged) {
-                    result.arrayLeft[modelRight.top] = modelRight
+
+                if (isMerged) {
+                    val modelNew = ModelReceiptData(
+                        0,
+                        modelMerge.left, modelMerge.top, modelRight.right, modelRight.bottom,
+                        modelMerge.text + " " + modelRight.text,
+                        modelMerge.symbols + " " + modelRight.symbols
+                    )
+
+                    result.arrayLeft[modelMerge.top!!] = modelNew
+
+                    createBoundingBox(
+                        Rect(
+                            modelNew.left!!,
+                            modelNew.top!!,
+                            modelNew.right!!,
+                            modelNew.bottom!!
+                        ), 2
+                    )
+                    Log.d("MERGING", "" + modelNew.text)
                 }
+                if (!isMerged) {
+                    result.arrayLeft[modelRight.top!!] = modelRight
+
+                }
+                Log.d("MERGING", "_end....")
             }
 
 
@@ -401,8 +424,6 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 //
 //
 //            }
-
-
 
 
 //            if (!result.listParent.isNullOrEmpty()) {
@@ -525,37 +546,39 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         binding.indeterminateBar.visibility = View.GONE
     }
 
-    private fun calculatePercentage(data:HashMap<Int, ModelReceiptData>){
-        val map=HashMap<Int,ModelReceiptData>()
+    private fun calculatePercentage(data: HashMap<Int, ModelReceiptData>) {
+        val map = HashMap<Int, ModelReceiptData>()
 
+        for ((i, value) in data) {
+            val modelI = value
+            Log.d("#LEFT_DATA", "" + modelI.text)
 
-        for((i,value) in  data){
-            val modelI=value
-            val arrReversedI = modelI!!.symbols.trim().split(" ").toTypedArray()
+            val arrReversedI = modelI.symbols.trim().split(" ").toTypedArray()
 
             // iterating string array
-            var wordsI=""
-            var pointer=0
-            for(j in arrReversedI.size-1 downTo 0){
-                wordsI+= arrReversedI[j]+" "
+            var wordsI = ""
+            var pointer = 0
+            for (j in arrReversedI.size - 1 downTo 0) {
+                wordsI += arrReversedI[j] + " "
 
                 //comparing symbols in other string
-                for((k,value) in  data){
-                    if(k!=i){
-                        val modelK=data[k]
+                for ((k, value) in data) {
+                    if (k != i) {
+                        val modelK = data[k]
                         val arrReversedK = modelK!!.symbols.trim().split(" ").toTypedArray()
 
-                        var wordsK=""
-                        for(kr in arrReversedK.size-1 downTo 0){
-                            wordsK +=arrReversedK[kr]+" "
-                            if(wordsI==wordsK){
-                               // map[i]= wordsK
-                                modelI.percentageOfMatch=(((arrReversedK.size-kr)*100)/arrReversedK.size)
-                                map[i]= modelI
+                        var wordsK = ""
+                        for (kr in arrReversedK.size - 1 downTo 0) {
+                            wordsK += arrReversedK[kr] + " "
+                            if (wordsI == wordsK) {
+                                // map[i]= wordsK
+                                modelI.percentageOfMatch =
+                                    (((arrReversedK.size - kr) * 100) / arrReversedK.size)
+                                map[i] = modelI
                                 //println("Matched: "+k+"_"+wordsI+"___"+wordsK)
 
-                            }else{
-                                pointer=k+1
+                            } else {
+                                pointer = k + 1
                                 // println("Not Matched: "+k+"_"+wordsI+"___"+wordsK)
 
                             }
@@ -569,23 +592,100 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
         }
 
-        map.forEach{
-        val model=it.value
-            createBoundingBox(
-                Rect(
-                    model.left!!,
-                    model.top!!,
-                    model.right!!,
-                    model.bottom!!
-                ), 2
-            )
-            println("Main: key "+it.key+" = "+it.value.text+"   "+it.value.percentageOfMatch)
+        val arrayPatternTotal = arrayOf("TOTAL", "CURRENCY","NUMSFSNUM")
+        val arrayPatternItems = arrayOf("STR", "NUM","SC","KG","CURRENCY","QSS")
+        val arrayPatternAddress = arrayOf("STR", "SC","SPS","SPE","SH")
+        val arrayPatternReceiptNumber = arrayOf("STR", "SCO","NUM")
+
+        map.forEach {
+            val model = it.value
+
+            var pTotal=0
+            var pItem=0
+            var pAddress=0
+            var pReceiptNo=0
+
+            pTotal=(100/arrayPatternTotal.size)
+            pItem=(100/arrayPatternItems.size)
+            pAddress=(100/arrayPatternAddress.size)
+            pReceiptNo=(100/arrayPatternReceiptNumber.size)
+
+            arrayPatternTotal.forEach {str->
+                if(model.symbols.contains(str,true)){
+                    val old:Int=map[it.key]?.percentageTotal?:0
+                    map[it.key]?.percentageTotal = (old+pTotal)
+                }
+            }
+
+            arrayPatternItems.forEach {str->
+                if(model.symbols.contains(str,true)){
+                    val old:Int=map[it.key]?.percentageItem?:0
+                    map[it.key]?.percentageItem = (old+pItem)
+
+                }
+            }
+            arrayPatternAddress.forEach {str->
+                if(model.symbols.contains(str,true)){
+                    val old:Int=map[it.key]?.percentageAddress?:0
+                    map[it.key]?.percentageAddress = (old+pAddress)
+                }
+            }
+            arrayPatternReceiptNumber.forEach {str->
+                if(model.symbols.contains(str,true)){
+                    val old:Int=map[it.key]?.percentageReceiptNumber?:0
+                    map[it.key]?.percentageReceiptNumber = (old+pReceiptNo)
+                }
+            }
+
+
+
+
+
+//
+//
+////                val strString="STR CURRENCY NUMSFSNUM "
+////            val regPatternTotal = """STR+([CURRENCY]+[NUMSFSNUM])?""".toRegex()
+//            val regPatternTotal = """(?=.*TOTAL)(?=.*CURRENCY)(?=.*NUMSFSNUM)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternAddress1 = """(?=.*STR)(?=.*NUM)(?=.*SH)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternAddress2 = """(?=.*STR)(?=.*NUM)(?=.*SPS)(?=.*SPS)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternAddress3 = """(?=.*STR)(?=.*NUMNUM)(?=.*SPS)(?=.*SPS)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternPinCode = """[0-9]{4,6}""".toRegex(RegexOption.IGNORE_CASE)
+//
+//            if (regPatternTotal.containsMatchIn(model.symbols)) {
+//                Log.d("#Detected_Total: ",""+model.text)
+//            } else {
+//                Log.d("#Detected_Total: ","Nothing")
+//            }
+//
+//            /* createBoundingBox(
+//                 Rect(
+//                     model.left!!,
+//                     model.top!!,
+//                     model.right!!,
+//                     model.bottom!!
+//                 ), 3
+//             )*/
+//            Log.d("#DATA_MERGED >>>", "" + it.value.text + "   " + it.value.symbols)
+////            println("Main: key " + it.key + " = " + it.value.text + "   " + it.value.percentageOfMatch)
+//
+
         }
+
+        map.forEach{
+            val model=it.value
+            Log.d("#Predicted: "+model.getHigherPercentage().percentage+" : "+model.getHigherPercentage().tag+" : ",""
+                    +model.percentageAddress+" _ "
+                    +model.percentageItem+" _ "
+                    +model.percentageTotal+" _ "
+                    +model.percentageReceiptNumber+" _ "
+            )
+        }
+
         postProcess()
     }
 
 
-    private fun postProcess(){
+    private fun postProcess() {
 
         val bmpMerged = Bitmap.createBitmap(
             bitmapOriginal.width,
@@ -596,9 +696,9 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         canvas.drawBitmap(bitmapOriginal, Matrix(), null)
         canvas.drawBitmap(bitmapOverlay, Matrix(), null)
 
-        val bmp=Bitmap.createScaledBitmap(bmpMerged,300,600,false)
+        val bmp = Bitmap.createScaledBitmap(bmpMerged, 300, 600, false)
         binding.icRect.setImageBitmap(bmp)
-        Toast.makeText(this,"Done..!",Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Done..!", Toast.LENGTH_LONG).show()
     }
 
     override fun onClick(view: View?) {
@@ -1030,7 +1130,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         val arraySymbols = ArrayList<String>()
         val inputStream: InputStream = assets.open("testtext.txt")
         var reader: BufferedReader? = null
-        val sb=StringBuilder()
+        val sb = StringBuilder()
         try {
             reader = BufferedReader(
                 InputStreamReader(assets.open("testtext.txt"))
@@ -1039,14 +1139,14 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             // do reading, usually loop until end of file reading
             val mLine = ""
             reader.readLines().forEach {
-                if (it.trim().isNotEmpty()&&it!=",") {
+                if (it.trim().isNotEmpty() && it != ",") {
                     val symbols = getSymbolicString(it)
                     arraySymbols.add(symbols)
                     sb.append("$symbols, \n")
                 }
 
             }
-            Log.d("###LINES", "" + sb.toString().replace(",","\n"))
+            Log.d("###LINES", "" + sb.toString().replace(",", "\n"))
             Log.d("###LINES", "" + arraySymbols.size)
 
         } catch (e: IOException) {
@@ -1063,18 +1163,4 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     }
 
 
-    override fun onResume() {
-        super.onResume()
-     //   val arrayPatternSymbols = HashMap<Int,ModelReceiptData>()
-
-//        arrayPatternSymbols[20]=ModelReceiptData(symbols = "a b c d e ")
-//        arrayPatternSymbols[40]=ModelReceiptData(symbols = "b b c d e ")
-//        arrayPatternSymbols[60]=ModelReceiptData(symbols = "c d c d e ")
-//        arrayPatternSymbols[80]=ModelReceiptData(symbols = "e f g d e ")
-//        arrayPatternSymbols[50]=ModelReceiptData(symbols = "z b c d e ")
-//        calculatePercentage(arrayPatternSymbols)
-
-
-      //  readAssetsFile()
-    }
 }

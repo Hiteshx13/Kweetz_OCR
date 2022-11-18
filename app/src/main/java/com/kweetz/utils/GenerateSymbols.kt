@@ -7,6 +7,7 @@ fun getSymbolicString(textLine: String): String {
     val regNumber = Regex("^[0-9]*$")
     val regAlphaNum = Regex("^[a-zA-Z0-9]*$")
     val arrayCurrency = arrayOf("$", "¥", "EUR", "GBP", "ZR", "SR")
+    val arrayTotal = arrayOf("total", "samaksai eur")
     val arraySymbols = arrayOf("x", "kg", "g")
     val regCombo = Regex("^[$0-9.]*$")
 
@@ -15,11 +16,12 @@ fun getSymbolicString(textLine: String): String {
     arrayWords.forEach { word ->
 
 
-        if (arrayCurrency.contains(word)) {
+        if (arrayTotal.contains(word.toLowerCase())) {
+            sbResults.append("TOTAL")
+        } else if (arrayCurrency.contains(word)) {
             sbResults.append("CURRENCY")
         } else if (word.matches(regAlphabets) && !arraySymbols.contains(
-                word.lowercase()
-            )
+                word.lowercase())
         ) {
             sbResults.append("STR")
         } else if (word.matches(regNumber)) {
