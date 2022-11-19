@@ -31,7 +31,7 @@ import com.scanlibrary.ScanActivity
 import java.io.*
 
 
-class AddReceiptActivity : BaseActivity(), View.OnClickListener {
+class AddReceiptActivity_old : BaseActivity(), View.OnClickListener {
 
     val PATH = "path"
     lateinit var binding: com.kweetz.databinding.ActivityAddReceiptBinding
@@ -46,7 +46,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
     companion object {
         fun getIntent(context: Context, receipt: Receipt? = Receipt()): Intent {
-            var intent = Intent(context, AddReceiptActivity::class.java)
+            var intent = Intent(context, AddReceiptActivity_old::class.java)
             intent.putExtra(RECEIPT, receipt)
             return intent
         }
@@ -415,9 +415,130 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 Log.d("MERGING", "_end....")
             }
 
+
+
             calculatePercentage(result.arrayLeft)
+//            result.arrayLeft.forEach{
+//                val model:ModelReceiptData=it.value
+//
+//
+//
+//            }
+
+
+//            if (!result.listParent.isNullOrEmpty()) {
+//                for (i in result.listParent!!) {
+//                    var arrayList: ArrayList<ModelReceiptData>? = i.value
+//
+//                    var height: Int = (data.bottom - data.top)
+//                    var min = data.top - (height / 2)
+//                    var max = data.bottom + (height / 2)
+//
+//                    if(){
+//
+//                    }
+//
+//
+//                    arrayList?.forEach { data ->
+//
+//                        var height: Int = (data.bottom - data.top)
+//                        var min = data.top - (height / 2)
+//                        var max = data.bottom + (height / 2)
+//
+//                        Log.d(
+//                            "#Data_",
+//                            "" + data.text + "_height" + height + "_top_" + data.top + "_min_" + min + "_max_" + max
+//                        )
+//                        if (data.left > thirdLength) {
+//                            var array = ArrayList<ModelReceiptData>()
+//
+//
+//
+//                            var isAdded = false
+//                            for (j in min..max) {
+//                                var isNew = true
+//
+//                                if (result.listParent!!.containsKey(j) /*&& j != data.top*/) {
+//                                    array = result.listParent!![j] as ArrayList<ModelReceiptData>
+//
+//                                    if (isAlphaNumerical(data.text)) {
+//                                        array.forEach { childItem ->
+//                                            if (childItem.text.equals(data.text, true)) {
+//                                                isNew = false
+//                                            }
+//                                        }
+//                                        if (isNew) {
+//                                            array.add(data)
+//                                            listTemp[j] = array
+//                                            isAdded = true
+//                                            break
+//                                        } else {
+//                                            listTemp[j] = array
+//                                            isAdded = true
+//                                        }
+//
+//                                    }
+//                                } else {
+////                                    array.add(data)
+//                                    listTemp[data.top] = array
+//                                    isAdded = true
+//                                }
+//                            }
+//
+//                            if (!isAdded) {
+//                                array.add(data)
+//                                listTemp[data.top] = array
+//                            }
+//
+//                        } else {
+//                            listTemp[i.key] = i.value
+//                        }
+//                    }
+//                }
+//            }
         }
 
+
+//        for (i in listTemp) {
+//            Log.d("#merged ",""+i.value)
+//            var array = i.value as ArrayList<ModelReceiptData>
+//            for (j in 0 until array.size) {
+//                var model = array[j]
+//                if (result?.receipt?.receiptNo?.isEmpty() == true) {
+//                    var receiptNo = ""
+//                    var receiptNumber = getReceiptNumber(model.text)
+//                    if (receiptNumber.isNotEmpty()) {
+//
+//                        var trimmed =
+//                            model.text.replace(receiptNumber, "", true).replace("o", "0", true)
+//                                .trim()
+//
+//                        if (!trimmed.isEmpty()) {
+//                            if (isContainNumerical(trimmed)) {
+//                                receiptNo = replaceSpecialChar(trimmed)
+//                                if (trimmed.contains("\n")) {
+//                                    receiptNo = trimmed.substring(0, trimmed.indexOf("\n"))
+//                                }
+//                            }
+//                        }
+//                    }
+//                    result.receipt?.receiptNo = receiptNo
+//                }
+//
+//                if (model.text.contains("8,3")) {
+//                    Log.d("", "")
+//                }
+//                if (isReceiptTotal(model.text) && result?.receipt?.receiptTotal?.isEmpty() == true) {
+//                    try {
+//                        result.receipt?.receiptTotal = array[j + 1].text
+//                    } catch (e: Exception) {
+//
+//                    }
+//                    binding.model = result.receipt
+//                    binding.notifyChange()
+//                }
+//            }
+//        }
 
         var receipt = result.receipt
         binding.model = receipt
@@ -471,87 +592,104 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
 
         }
 
-        val arrayPatternTotal = arrayOf("STR", "TOTAL", "CURRENCY", "NUMSFSNUM", "NUMSCNUM")
-        val arrayPatternItems = arrayOf("STR", "NUM", "SC", "CURRENCY", "QSS")
-        val arrayPatternAddress = arrayOf("STR", "SC", "SPS", "SPE", "SH")
-        val arrayPatternReceiptNumber = arrayOf("STR", "SCO", "NUM")
+        val arrayPatternTotal = arrayOf("TOTAL", "CURRENCY","NUMSFSNUM","NUMSCNUM")
+        val arrayPatternItems = arrayOf("STR", "NUM","SC","KG","CURRENCY","QSS","NUMSFSNUM","NUMSCNUM")
+        val arrayPatternAddress = arrayOf("STR", "SC","SPS","SPE","SH")
+        val arrayPatternReceiptNumber = arrayOf("STR", "SCO","NUM")
 
 
         map.forEach {
             val model = it.value
 
-            var pTotal = 0
-            var pItem = 0
-            var pAddress = 0
-            var pReceiptNo = 0
+            var pTotal=0
+            var pItem=0
+            var pAddress=0
+            var pReceiptNo=0
 
-            pTotal = (100 / arrayPatternTotal.size)
-            pItem = (100 / arrayPatternItems.size)
-            pAddress = (100 / arrayPatternAddress.size)
-            pReceiptNo = (100 / arrayPatternReceiptNumber.size)
+            pTotal=(100/arrayPatternTotal.size)
+            pItem=(100/arrayPatternItems.size)
+            pAddress=(100/arrayPatternAddress.size)
+            pReceiptNo=(100/arrayPatternReceiptNumber.size)
 
-            /*&& model.symbols.contains("NUMSFSNUM")
+            arrayPatternTotal.forEach {str->
+                if(model.symbols.contains(str,true) ){
+                    val old:Int=map[it.key]?.percentageTotal?:0
+                    map[it.key]?.percentageTotal = (old+pTotal)
+                }
+            }
+
+            arrayPatternItems.forEach {str->
+                if(model.symbols.contains(str,true)
+                    && !model.symbols.contains("TOTAL")){
+                    val old:Int=map[it.key]?.percentageItem?:0
+                    map[it.key]?.percentageItem = (old+pItem)
+
+                }
+            }
+            arrayPatternAddress.forEach {str->
+                if(model.symbols.contains(str,true)
                     && !model.symbols.contains("TOTAL")
-                    || model.symbols.contains(str, true) && model.symbols.contains("NUMSCNUM")
-                    && !model.symbols.contains("TOTAL")*/
-            arrayPatternTotal.forEach { str ->
-                if (model.symbols.contains(str, true)
-                ) {
-                    val old: Int = map[it.key]?.percentageTotal ?: 0
-                    map[it.key]?.percentageTotal = (old + pTotal)
+                    && !model.symbols.contains("CURRENCY")){
+                    val old:Int=map[it.key]?.percentageAddress?:0
+                    map[it.key]?.percentageAddress = (old+pAddress)
+                }
+            }
+            arrayPatternReceiptNumber.forEach {str->
+                if(model.symbols.contains(str,true)
+                    && !model.symbols.contains("TOTAL")
+                    && !model.symbols.contains("CURRENCY")
+                ){
+                    val old:Int=map[it.key]?.percentageReceiptNumber?:0
+                    map[it.key]?.percentageReceiptNumber = (old+pReceiptNo)
                 }
             }
 
-            arrayPatternItems.forEach { str ->
-                if (model.symbols.contains(str, true)
-                    && !model.symbols.contains("TOTAL", true) &&
-                    (
-                            model.symbols.contains("CURRENCY", true)
-                                    || model.symbols.contains("NUMSFSNUM", true)
-                                    || model.symbols.contains("NUMSCNUM", true))
-                ) {
-                    val old: Int = map[it.key]?.percentageItem ?: 0
-                    map[it.key]?.percentageItem = (old + pItem)
-                }
-            }
-            arrayPatternAddress.forEach { str ->
-                if (model.symbols.contains(str, true)
-                    && !model.symbols.contains("TOTAL", true)
-                    && !model.symbols.contains("CURRENCY", true)
-                ) {
-                    Log.d("#SPY_ADDRESS", "" + model.symbols)
-                    val old: Int = map[it.key]?.percentageAddress ?: 0
-                    map[it.key]?.percentageAddress = (old + pAddress)
-                }
-            }
-            arrayPatternReceiptNumber.forEach { str ->
-                if (model.symbols.contains(str, true)
-                    && !model.symbols.contains("TOTAL", true)
-                    && model.symbols.contains("NUM", true)
-                    && !model.symbols.contains("CURRENCY", true)
-                ) {
-                    Log.d("#SPY_ReceiptNumber", "" + model.symbols)
-                    val old: Int = map[it.key]?.percentageReceiptNumber ?: 0
-                    map[it.key]?.percentageReceiptNumber = (old + pReceiptNo)
-                }
-            }
+
+
+
+
+//
+//
+////                val strString="STR CURRENCY NUMSFSNUM "
+////            val regPatternTotal = """STR+([CURRENCY]+[NUMSFSNUM])?""".toRegex()
+//            val regPatternTotal = """(?=.*TOTAL)(?=.*CURRENCY)(?=.*NUMSFSNUM)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternAddress1 = """(?=.*STR)(?=.*NUM)(?=.*SH)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternAddress2 = """(?=.*STR)(?=.*NUM)(?=.*SPS)(?=.*SPS)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternAddress3 = """(?=.*STR)(?=.*NUMNUM)(?=.*SPS)(?=.*SPS)""".toRegex(RegexOption.IGNORE_CASE)
+//            val regPatternPinCode = """[0-9]{4,6}""".toRegex(RegexOption.IGNORE_CASE)
+//
+//            if (regPatternTotal.containsMatchIn(model.symbols)) {
+//                Log.d("#Detected_Total: ",""+model.text)
+//            } else {
+//                Log.d("#Detected_Total: ","Nothing")
+//            }
+//
+//            /* createBoundingBox(
+//                 Rect(
+//                     model.left!!,
+//                     model.top!!,
+//                     model.right!!,
+//                     model.bottom!!
+//                 ), 3
+//             )*/
+//            Log.d("#DATA_MERGED >>>", "" + it.value.text + "   " + it.value.symbols)
+////            println("Main: key " + it.key + " = " + it.value.text + "   " + it.value.percentageOfMatch)
+//
+
         }
 
-        map.forEach {
-            val model = it.value
-//            when(model.getHigherPercentage().tag.contains(CLASS_TOTAL,true)
-//                    && model.symbols.contains(CLASS_TOTAL,true) ){
-//
-//            }
-            Log.d(
-                "#Predicted: " + model.getHigherPercentage().percentage + " : " + model.getHigherPercentage().tag + " : ",
-                ""
-                        + model.percentageAddress + " _ "
-                        + model.percentageItem + " _ "
-                        + model.percentageTotal + " _ "
-                        + model.percentageReceiptNumber + " _ "
-                        + model.text + " "
-                        + model.symbols + " "
+        map.forEach{
+            val model=it.value
+            when(model.getHigherPercentage().tag.contains(CLASS_TOTAL,true)
+                    && model.symbols.contains(CLASS_TOTAL,true) ){
+
+            }
+            Log.d("#Predicted: "+model.getHigherPercentage().percentage+" : "+model.getHigherPercentage().tag+" : ",""
+                    +model.percentageAddress+" _ "
+                    +model.percentageItem+" _ "
+                    +model.percentageTotal+" _ "
+                    +model.percentageReceiptNumber+" _ "
+                    +model.text+" "
             )
         }
 
@@ -610,7 +748,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         binding.notifyChange()
                         super.onRecentCameraSelected()
                         if (ContextCompat.checkSelfPermission(
-                                this@AddReceiptActivity, Manifest.permission.CAMERA
+                                this@AddReceiptActivity_old, Manifest.permission.CAMERA
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
                             requestPermissions(
@@ -627,26 +765,26 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                         binding.model = Receipt()
                         binding.notifyChange()
                         if (ContextCompat.checkSelfPermission(
-                                this@AddReceiptActivity,
+                                this@AddReceiptActivity_old,
                                 Manifest.permission.READ_EXTERNAL_STORAGE
                             )
                             != PackageManager.PERMISSION_GRANTED
                         ) {
 
                             if (ActivityCompat.shouldShowRequestPermissionRationale(
-                                    this@AddReceiptActivity,
+                                    this@AddReceiptActivity_old,
                                     Manifest.permission.READ_EXTERNAL_STORAGE
                                 )
                             ) {
                                 Toast.makeText(
-                                    this@AddReceiptActivity,
+                                    this@AddReceiptActivity_old,
                                     "Please grant all required permissions from application settings",
                                     Toast.LENGTH_LONG
                                 ).show()
 
                             } else {
                                 ActivityCompat.requestPermissions(
-                                    this@AddReceiptActivity,
+                                    this@AddReceiptActivity_old,
                                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                                     PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
                                 )
@@ -682,7 +820,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 } else {
                     showToast(
                         this,
-                        this@AddReceiptActivity.getString(R.string.grant_all_permission)
+                        this@AddReceiptActivity_old.getString(R.string.grant_all_permission)
                     )
                 }
                 return
@@ -693,7 +831,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 } else {
                     showToast(
                         this,
-                        this@AddReceiptActivity.getString(R.string.grant_all_permission)
+                        this@AddReceiptActivity_old.getString(R.string.grant_all_permission)
                     )
                 }
                 return
@@ -725,6 +863,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
         if (cameraIntent.resolveActivity(packageManager) != null) {
             startActivityForResult(cameraIntent, REQUEST_CODE_CAMERA)
         }
+
     }
 
 
@@ -764,16 +903,276 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                     list.add(RealPathUtil.getRealPath(this, data.data!!))
                 }
 
+
+                //  binding.rlBackground.background = BitmapDrawable(toGrayscale(bitmap) )
                 data?.putExtra(getString(R.string.request_code), reqCode)
                 data?.putExtra(getString(R.string.image_uri), imageUri)
                 binding.indeterminateBar.visibility = View.VISIBLE
+//            var mLoader = MyAsyncTask(this, data, imageUri, reqCode)
+//             firebaseTextDetection(this, data, imageUri, reqCode)
+
 
                 val intent = ScanActivity.getActivityIntent(this, list)
                 startActivityForResult(intent, REQUEST_PHOTO_EDIT)
+//            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out)
+//            mLoader.registerListener(0) { loader, receipt ->
+//
+//                Log.d("#run", "over")
+//                binding.indeterminateBar.visibility = View.GONE
+//
+//                //binding.rlBackground.background = BitmapDrawable(this.resources, receipt!!.bitmap)
+//                updateUI(receipt)
+//            }
+//            mLoader.startLoading()
             }
         } else {
             Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show()
         }
     }
+
+//    class MyAsyncTask(context: Context, var data: Intent?, var imageUri: Uri?, var reqCode: Int) : AsyncTaskLoader<ModelAsyncResult>(context) {
+//
+//        var pointer = 0
+//        var arrayParent = ArrayList<ArrayList<String>?>()
+//        lateinit var listParent: HashMap<Int, ArrayList<ModelReceiptData>?>
+//        var textRecognizer: TextRecognizer = TextRecognizer.Builder(context).build()
+//        lateinit var receipt: Receipt
+//        lateinit var bitmap: Bitmap
+//        lateinit var bitmapTemp: Bitmap
+//        lateinit var bitmapOverlay: Bitmap
+//
+//        //var reqCode = data?.getIntExtra(context.getString(R.string.request_code), 0)
+//        var paint = Paint()
+//
+//        override fun onStartLoading() {
+//            forceLoad()
+//            Log.d("#run", "onStartLoading")
+//        }
+//
+//        override fun loadInBackground(): ModelAsyncResult? {
+//            receipt = Receipt()
+//            textRecognizer.setProcessor(object : Detector.Processor<TextBlock> {
+//                override fun release() {
+//                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                }
+//
+//                /**
+//                 * Detect all the text from camera using TextBlock and the values into a stringBuilder
+//                 * which will then be set to the textView.
+//                 */
+//                override fun receiveDetections(detections: Detector.Detections<TextBlock>) {
+//                    val items = detections.detectedItems
+//
+//                    if (items.size() != 0) {
+//
+//                        val stringBuilder = StringBuilder()
+//                        for (i in 0 until items.size()) {
+//                            val item = items.valueAt(i)
+//
+//                            stringBuilder.append(item.value)
+//                            Log.d("#Detected $i", " = " + item.value)
+//                            stringBuilder.append("\n")
+//                        }
+//                    }
+//                }
+//            })
+//
+//            try {
+//                arrayParent = ArrayList()
+//                val frame: Frame
+//                if (reqCode == REQUEST_CODE_CAMERA) {
+//                    bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+//                } else {
+//                    val imageStream = context.contentResolver.openInputStream(data!!.data!!)
+//                    bitmap = BitmapFactory.decodeStream(imageStream)
+//                }
+////                firebaseTextDetection(bitmap)
+//                bitmapTemp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+//
+//                if (bitmap.width > bitmap.height) {
+//                    var matrix = Matrix()
+//                    matrix.postRotate(90f)
+//
+//                    var scalled = Bitmap.createScaledBitmap(bitmap, bitmap.width, bitmap.height, true)
+//                    bitmap = Bitmap.createBitmap(scalled, 0, 0, scalled.width, scalled.height, matrix, true)
+//                }
+//
+//                bitmap = convevrtToGrayscale(bitmap)
+//                bitmapOverlay = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+//
+//                frame = Frame.Builder().setBitmap(bitmap).build()
+//                val items = textRecognizer.detect(frame)
+//
+//                listParent = HashMap()
+//                val stringBuilder = StringBuilder()
+//
+//
+////                val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
+////                val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
+////                        .onDeviceTextRecognizer
+////                val result: Task<FirebaseVisionText> = detector.processImage(image)
+////                        .addOnSuccessListener {
+////                            val resultText = it.text
+////                            for (block in it.textBlocks) {
+////                                val blockText = block.text
+////                                val blockConfidence = block.confidence
+////                                val blockLanguages = block.recognizedLanguages
+////                                val blockCornerPoints = block.cornerPoints
+////                                val blockFrame = block.boundingBox
+////                                for (line in block.lines) {
+////                                    val lineText = line.text
+////
+////                                    val lineConfidence = line.confidence
+////                                    val lineLanguages = line.recognizedLanguages
+////                                    val lineCornerPoints = line.cornerPoints
+////                                    val lineFrame = line.boundingBox
+////                                    for (element in line.elements) {
+////                                        val item = element
+////
+//////                                        var item = blockText.components[zz]
+////                                        var posTop = item.boundingBox!!.top
+////                                        Log.d("#Firebase: ", "" + item.text + "_top:" + item.boundingBox!!.top)
+////                                        var array = ArrayList<ModelReceiptData>()
+////                                        if (listParent.containsKey(posTop)) {
+////                                            array = listParent[posTop] as ArrayList<ModelReceiptData>
+////                                        }
+////                                        var tLeft = item.boundingBox!!.left
+////                                        var tTop = item.boundingBox!!.top
+////                                        var tRight = item.boundingBox!!.right
+////                                        var tBottom = item.boundingBox!!.bottom
+////                                        array.add(ModelReceiptData(tLeft, tTop, tRight, tBottom, item.text))
+////                                        listParent[posTop] = array
+////                                        stringBuilder.append(item.text)
+////
+////                                        if (receipt.receiptIssuer.isEmpty()) {
+////                                            receipt.receiptIssuer = gerReceiptIssuer(replaceSpecialChar(item.text.trim()))
+////                                        }
+////
+////                                        if (isDateTimePattern(item.text)) {
+////                                            receipt.receiptDate = item.text.trim()
+////                                        } else if (isDatePattern(item.text)) {
+////                                            val receiptTime = replaceSpace(receipt.receiptDate)
+////                                            receipt.receiptDate = item.text.trim() + " " + receiptTime
+////                                        } else if (isTimePattern(item.text)) {
+////                                            val receiptdate = receipt.receiptDate
+////                                            receipt.receiptDate = receiptdate + " " + replaceSpace(item.text)
+////                                        }
+////                                        stringBuilder.append("\n")
+////
+////
+//////                                    Log.d("#Firebase: ",""+elementText)
+////                                        val elementConfidence = element.confidence
+////                                        val elementLanguages = element.recognizedLanguages
+////                                        val elementCornerPoints = element.cornerPoints
+////                                        val elementFrame = element.boundingBox
+////                                    }
+////                                }
+////                            }
+////                            receipt.receiptFullText = stringBuilder.toString().trim()
+////                        }
+////                        .addOnFailureListener(
+////                                object : OnFailureListener {
+////                                    override fun onFailure(p0: java.lang.Exception) {
+////                                        Log.d("#Firebase: ", "")
+////                                    }
+////
+////                                })
+////
+//////                    }
+//////                }
+//
+//
+//            } catch (e: FileNotFoundException) {
+//                e.printStackTrace()
+//
+//            }
+//
+//            return ModelAsyncResult(bitmapOverlay, receipt, listParent)
+//        }
+//
+//
+//
+//
+////        fun firebaseTextDetection(bitmap:Bitmap){
+////
+////            val image: FirebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap)
+////            val detector: FirebaseVisionTextRecognizer = FirebaseVision.getInstance()
+////                    .onDeviceTextRecognizer
+////            val result: Task<FirebaseVisionText> = detector.processImage(image)
+////                    .addOnSuccessListener {
+////                        val resultText = it.text
+////                        for (block in it.textBlocks) {
+////                            val blockText = block.text
+////                            val blockConfidence = block.confidence
+////                            val blockLanguages = block.recognizedLanguages
+////                            val blockCornerPoints = block.cornerPoints
+////                            val blockFrame = block.boundingBox
+////                            for (line in block.lines) {
+////                                val lineText = line.text
+////                                Log.d("#Firebase: ",""+lineText)
+////                                val lineConfidence = line.confidence
+////                                val lineLanguages = line.recognizedLanguages
+////                                val lineCornerPoints = line.cornerPoints
+////                                val lineFrame = line.boundingBox
+////                                for (element in line.elements) {
+////                                    val elementText = element.text
+//////                                    Log.d("#Firebase: ",""+elementText)
+////                                    val elementConfidence = element.confidence
+////                                    val elementLanguages = element.recognizedLanguages
+////                                    val elementCornerPoints = element.cornerPoints
+////                                    val elementFrame = element.boundingBox
+////                                }
+////                            }
+////                        }
+////                    }
+////                    .addOnFailureListener(
+////                            object : OnFailureListener {
+////                                override fun onFailure(p0: java.lang.Exception) {
+////                                    Log.d("#Firebase: ","")
+////                                }
+////
+////                            })
+////
+////        }
+//
+//    }
+
+
+    fun readAssetsFile() {
+        val arraySymbols = ArrayList<String>()
+        val inputStream: InputStream = assets.open("testtext.txt")
+        var reader: BufferedReader? = null
+        val sb = StringBuilder()
+        try {
+            reader = BufferedReader(
+                InputStreamReader(assets.open("testtext.txt"))
+            )
+
+            // do reading, usually loop until end of file reading
+            val mLine = ""
+            reader.readLines().forEach {
+                if (it.trim().isNotEmpty() && it != ",") {
+                    val symbols = getSymbolicString(it)
+                    arraySymbols.add(symbols)
+                    sb.append("$symbols, \n")
+                }
+
+            }
+            Log.d("###LINES", "" + sb.toString().replace(",", "\n"))
+            Log.d("###LINES", "" + arraySymbols.size)
+
+        } catch (e: IOException) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close()
+                } catch (e: IOException) {
+                    //log the exception
+                }
+            }
+        }
+    }
+
 
 }

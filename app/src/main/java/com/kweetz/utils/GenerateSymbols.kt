@@ -1,11 +1,12 @@
 package com.kweetz.utils
+import java.util.*
 
 
 fun getSymbolicString(textLine: String): String {
 
     val regAlphabets = Regex("^[a-zA-Z]*$")
     val regNumber = Regex("^[0-9]*$")
-    val regAlphaNum = Regex("^[a-zA-Z0-9]*$")
+    val regAlphaNum = Regex("^(?=.*[A-Za-z])(?=.*[0-9])[a-zA-Z0-9]+$")
     val arrayCurrency = arrayOf("$", "¥", "EUR", "GBP", "ZR", "SR")
     val arrayTotal = arrayOf("total", "samaksai eur")
     val arraySymbols = arrayOf("x", "kg", "g")
@@ -16,12 +17,14 @@ fun getSymbolicString(textLine: String): String {
     arrayWords.forEach { word ->
 
 
-        if (arrayTotal.contains(word.toLowerCase())) {
+        if (arrayTotal.contains(word.lowercase(Locale.getDefault()))) {
             sbResults.append("TOTAL")
         } else if (arrayCurrency.contains(word)) {
             sbResults.append("CURRENCY")
-        } else if (word.matches(regAlphabets) && !arraySymbols.contains(
-                word.lowercase())
+        } else if (word.matches(regAlphabets) && !arraySymbols.contains(word.lowercase()) && !word.contains(
+                "total",
+                true
+            )
         ) {
             sbResults.append("STR")
         } else if (word.matches(regNumber)) {
@@ -35,6 +38,8 @@ fun getSymbolicString(textLine: String): String {
             val tempPettern = StringBuffer()
             var current = ""
             word.forEach { chr ->
+
+
                 if (arrayCurrency.contains(chr.toString()) && current != "CURRENCY") {
                     tempPettern.append("CURRENCY")
                     current = "CURRENCY"
@@ -54,8 +59,9 @@ fun getSymbolicString(textLine: String): String {
 
             }
             sbResults.append(tempPettern.toString())
+        } else if (word.contains("total")) {
+            sbResults.append("TOTAL")
         } else {
-
             word.forEach { chr ->
 
                 if (chr.toString().matches(regAlphabets) && !arraySymbols.contains(
@@ -122,9 +128,6 @@ fun getSymbolicString(textLine: String): String {
 
     }
     println(sbResults)
-//            arrayResults.add(sbResults.toString())
-
-
     return sbResults.toString()
 }
 
