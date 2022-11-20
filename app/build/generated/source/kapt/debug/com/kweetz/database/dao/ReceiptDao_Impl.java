@@ -124,45 +124,52 @@ public final class ReceiptDao_Impl implements ReceiptDao {
       final List<Receipt> _result = new ArrayList<Receipt>(_cursor.getCount());
       while(_cursor.moveToNext()) {
         final Receipt _item;
+        _item = new Receipt();
         final int _tmpID;
         _tmpID = _cursor.getInt(_cursorIndexOfID);
+        _item.setID(_tmpID);
         final String _tmpReceiptNo;
         if (_cursor.isNull(_cursorIndexOfReceiptNo)) {
           _tmpReceiptNo = null;
         } else {
           _tmpReceiptNo = _cursor.getString(_cursorIndexOfReceiptNo);
         }
+        _item.setReceiptNo(_tmpReceiptNo);
         final String _tmpReceiptDate;
         if (_cursor.isNull(_cursorIndexOfReceiptDate)) {
           _tmpReceiptDate = null;
         } else {
           _tmpReceiptDate = _cursor.getString(_cursorIndexOfReceiptDate);
         }
+        _item.setReceiptDate(_tmpReceiptDate);
         final String _tmpReceiptIssuer;
         if (_cursor.isNull(_cursorIndexOfReceiptIssuer)) {
           _tmpReceiptIssuer = null;
         } else {
           _tmpReceiptIssuer = _cursor.getString(_cursorIndexOfReceiptIssuer);
         }
+        _item.setReceiptIssuer(_tmpReceiptIssuer);
         final String _tmpReceiptTotal;
         if (_cursor.isNull(_cursorIndexOfReceiptTotal)) {
           _tmpReceiptTotal = null;
         } else {
           _tmpReceiptTotal = _cursor.getString(_cursorIndexOfReceiptTotal);
         }
+        _item.setReceiptTotal(_tmpReceiptTotal);
         final String _tmpReceiptDescription;
         if (_cursor.isNull(_cursorIndexOfReceiptDescription)) {
           _tmpReceiptDescription = null;
         } else {
           _tmpReceiptDescription = _cursor.getString(_cursorIndexOfReceiptDescription);
         }
+        _item.setReceiptDescription(_tmpReceiptDescription);
         final String _tmpReceiptFullText;
         if (_cursor.isNull(_cursorIndexOfReceiptFullText)) {
           _tmpReceiptFullText = null;
         } else {
           _tmpReceiptFullText = _cursor.getString(_cursorIndexOfReceiptFullText);
         }
-        _item = new Receipt(_tmpID,_tmpReceiptNo,_tmpReceiptDate,_tmpReceiptIssuer,_tmpReceiptTotal,_tmpReceiptDescription,_tmpReceiptFullText);
+        _item.setReceiptFullText(_tmpReceiptFullText);
         _result.add(_item);
       }
       return _result;
@@ -198,45 +205,52 @@ public final class ReceiptDao_Impl implements ReceiptDao {
       final int _cursorIndexOfReceiptFullText = CursorUtil.getColumnIndexOrThrow(_cursor, "ReceiptFullText");
       final Receipt _result;
       if(_cursor.moveToFirst()) {
+        _result = new Receipt();
         final int _tmpID;
         _tmpID = _cursor.getInt(_cursorIndexOfID);
+        _result.setID(_tmpID);
         final String _tmpReceiptNo;
         if (_cursor.isNull(_cursorIndexOfReceiptNo)) {
           _tmpReceiptNo = null;
         } else {
           _tmpReceiptNo = _cursor.getString(_cursorIndexOfReceiptNo);
         }
+        _result.setReceiptNo(_tmpReceiptNo);
         final String _tmpReceiptDate;
         if (_cursor.isNull(_cursorIndexOfReceiptDate)) {
           _tmpReceiptDate = null;
         } else {
           _tmpReceiptDate = _cursor.getString(_cursorIndexOfReceiptDate);
         }
+        _result.setReceiptDate(_tmpReceiptDate);
         final String _tmpReceiptIssuer;
         if (_cursor.isNull(_cursorIndexOfReceiptIssuer)) {
           _tmpReceiptIssuer = null;
         } else {
           _tmpReceiptIssuer = _cursor.getString(_cursorIndexOfReceiptIssuer);
         }
+        _result.setReceiptIssuer(_tmpReceiptIssuer);
         final String _tmpReceiptTotal;
         if (_cursor.isNull(_cursorIndexOfReceiptTotal)) {
           _tmpReceiptTotal = null;
         } else {
           _tmpReceiptTotal = _cursor.getString(_cursorIndexOfReceiptTotal);
         }
+        _result.setReceiptTotal(_tmpReceiptTotal);
         final String _tmpReceiptDescription;
         if (_cursor.isNull(_cursorIndexOfReceiptDescription)) {
           _tmpReceiptDescription = null;
         } else {
           _tmpReceiptDescription = _cursor.getString(_cursorIndexOfReceiptDescription);
         }
+        _result.setReceiptDescription(_tmpReceiptDescription);
         final String _tmpReceiptFullText;
         if (_cursor.isNull(_cursorIndexOfReceiptFullText)) {
           _tmpReceiptFullText = null;
         } else {
           _tmpReceiptFullText = _cursor.getString(_cursorIndexOfReceiptFullText);
         }
-        _result = new Receipt(_tmpID,_tmpReceiptNo,_tmpReceiptDate,_tmpReceiptIssuer,_tmpReceiptTotal,_tmpReceiptDescription,_tmpReceiptFullText);
+        _result.setReceiptFullText(_tmpReceiptFullText);
       } else {
         _result = null;
       }

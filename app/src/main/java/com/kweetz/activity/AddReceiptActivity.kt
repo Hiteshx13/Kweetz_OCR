@@ -28,6 +28,9 @@ import com.kweetz.model.ModelAsyncResult
 import com.kweetz.model.ModelReceiptData
 import com.kweetz.utils.*
 import com.scanlibrary.ScanActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.*
 
 
@@ -426,138 +429,162 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun calculatePercentage(data: HashMap<Int, ModelReceiptData>) {
-        val map = HashMap<Int, ModelReceiptData>()
+        var map = HashMap<Int, ModelReceiptData>()
+        map = data
+        runBlocking {
+            launch(Dispatchers.IO) {
 
-        for ((i, value) in data) {
-            val modelI = value
-            Log.d("#LEFT_DATA", "" + modelI.text)
-
-            val arrReversedI = modelI.symbols.trim().split(" ").toTypedArray()
-
-            // iterating string array
-            var wordsI = ""
-            var pointer = 0
-            for (j in arrReversedI.size - 1 downTo 0) {
-                wordsI += arrReversedI[j] + " "
-
-                //comparing symbols in other string
-                for ((k, value) in data) {
-                    if (k != i) {
-                        val modelK = data[k]
-                        val arrReversedK = modelK!!.symbols.trim().split(" ").toTypedArray()
-
-                        var wordsK = ""
-                        for (kr in arrReversedK.size - 1 downTo 0) {
-                            wordsK += arrReversedK[kr] + " "
-                            if (wordsI == wordsK) {
-                                // map[i]= wordsK
-                                modelI.percentageOfMatch =
-                                    (((arrReversedK.size - kr) * 100) / arrReversedK.size)
-                                map[i] = modelI
-                                //println("Matched: "+k+"_"+wordsI+"___"+wordsK)
-
-                            } else {
-                                pointer = k + 1
-                                // println("Not Matched: "+k+"_"+wordsI+"___"+wordsK)
-
-                            }
-
-                        }
-
-                    }
-                }
-
-            }
-
-        }
-
-        val arrayPatternTotal = arrayOf("STR", "TOTAL", "CURRENCY", "NUMSFSNUM", "NUMSCNUM")
-        val arrayPatternItems = arrayOf("STR", "NUM", "SC", "CURRENCY", "QSS")
-        val arrayPatternAddress = arrayOf("STR", "SC", "SPS", "SPE", "SH")
-        val arrayPatternReceiptNumber = arrayOf("STR", "SCO", "NUM")
-
-
-        map.forEach {
-            val model = it.value
-
-            var pTotal = 0
-            var pItem = 0
-            var pAddress = 0
-            var pReceiptNo = 0
-
-            pTotal = (100 / arrayPatternTotal.size)
-            pItem = (100 / arrayPatternItems.size)
-            pAddress = (100 / arrayPatternAddress.size)
-            pReceiptNo = (100 / arrayPatternReceiptNumber.size)
-
-            /*&& model.symbols.contains("NUMSFSNUM")
-                    && !model.symbols.contains("TOTAL")
-                    || model.symbols.contains(str, true) && model.symbols.contains("NUMSCNUM")
-                    && !model.symbols.contains("TOTAL")*/
-            arrayPatternTotal.forEach { str ->
-                if (model.symbols.contains(str, true)
-                ) {
-                    val old: Int = map[it.key]?.percentageTotal ?: 0
-                    map[it.key]?.percentageTotal = (old + pTotal)
-                }
-            }
-
-            arrayPatternItems.forEach { str ->
-                if (model.symbols.contains(str, true)
-                    && !model.symbols.contains("TOTAL", true) &&
-                    (
-                            model.symbols.contains("CURRENCY", true)
-                                    || model.symbols.contains("NUMSFSNUM", true)
-                                    || model.symbols.contains("NUMSCNUM", true))
-                ) {
-                    val old: Int = map[it.key]?.percentageItem ?: 0
-                    map[it.key]?.percentageItem = (old + pItem)
-                }
-            }
-            arrayPatternAddress.forEach { str ->
-                if (model.symbols.contains(str, true)
-                    && !model.symbols.contains("TOTAL", true)
-                    && !model.symbols.contains("CURRENCY", true)
-                ) {
-                    Log.d("#SPY_ADDRESS", "" + model.symbols)
-                    val old: Int = map[it.key]?.percentageAddress ?: 0
-                    map[it.key]?.percentageAddress = (old + pAddress)
-                }
-            }
-            arrayPatternReceiptNumber.forEach { str ->
-                if (model.symbols.contains(str, true)
-                    && !model.symbols.contains("TOTAL", true)
-                    && model.symbols.contains("NUM", true)
-                    && !model.symbols.contains("CURRENCY", true)
-                ) {
-                    Log.d("#SPY_ReceiptNumber", "" + model.symbols)
-                    val old: Int = map[it.key]?.percentageReceiptNumber ?: 0
-                    map[it.key]?.percentageReceiptNumber = (old + pReceiptNo)
-                }
-            }
-        }
-
-        map.forEach {
-            val model = it.value
-//            when(model.getHigherPercentage().tag.contains(CLASS_TOTAL,true)
-//                    && model.symbols.contains(CLASS_TOTAL,true) ){
+//        for ((i, value) in data) {
+//            val modelI = value
+//            Log.d("#LEFT_DATA", "" + modelI.text)
+//
+//            val arrReversedI = modelI.symbols.trim().split(" ").toTypedArray()
+//
+//            // iterating string array
+//            var wordsI = ""
+//            var pointer = 0
+//            for (j in arrReversedI.size - 1 downTo 0) {
+//                wordsI += arrReversedI[j] + " "
+//
+//                //comparing symbols in other string
+//                for ((k, value) in data) {
+//                    if (k != i) {
+//                        val modelK = data[k]
+//                        val arrReversedK = modelK!!.symbols.trim().split(" ").toTypedArray()
+//
+//                        var wordsK = ""
+//                        for (kr in arrReversedK.size - 1 downTo 0) {
+//                            wordsK += arrReversedK[kr] + " "
+//                            if (wordsI == wordsK) {
+//                                // map[i]= wordsK
+//                                modelI.percentageOfMatch =
+//                                    (((arrReversedK.size - kr) * 100) / arrReversedK.size)
+//                                map[i] = modelI
+//                                //println("Matched: "+k+"_"+wordsI+"___"+wordsK)
+//
+//                            } else {
+//                                pointer = k + 1
+//                                // println("Not Matched: "+k+"_"+wordsI+"___"+wordsK)
+//
+//                            }
+//
+//                        }
+//
+//                    }
+//                }
 //
 //            }
-            Log.d(
-                "#Predicted: " + model.getHigherPercentage().percentage + " : " + model.getHigherPercentage().tag + " : ",
-                ""
-                        + model.percentageAddress + " _ "
-                        + model.percentageItem + " _ "
-                        + model.percentageTotal + " _ "
-                        + model.percentageReceiptNumber + " _ "
-                        + model.text + " "
-                        + model.symbols + " "
-            )
+//
+//        }
+
+                val arrayPatternTotal = arrayOf("STR", "TOTAL", "CURRENCY", "NUMSFSNUM", "NUMSCNUM")
+                val arrayPatternItems = arrayOf("STR", "NUM", "SC", "CURRENCY", "QSS")
+                val arrayPatternAddress = arrayOf("STR", "SC", "SPS", "SPE", "SH")
+                val arrayPatternReceiptNumber = arrayOf("STR", "SCO", "NUM")
+
+
+                map.forEach {
+                    val model = it.value
+                    var pTotal  = (100 / arrayPatternTotal.size)
+                    var pItem= (100 / arrayPatternItems.size)
+                    var pAddress = (100 / arrayPatternAddress.size)
+                    val pReceiptNo = (100 / arrayPatternReceiptNumber.size)
+
+                    arrayPatternTotal.forEach { str ->
+                        if (model.symbols.contains(str, true)
+                        ) {
+                            val old: Int = map[it.key]?.percentageTotal ?: 0
+                            map[it.key]?.percentageTotal = (old + pTotal)
+                        }
+                    }
+
+                    arrayPatternItems.forEach { str ->
+                        if (model.symbols.contains(str, true)
+                            && !model.symbols.contains("TOTAL", true) &&
+                            (
+                                    model.symbols.contains("CURRENCY", true)
+                                            || model.symbols.contains("NUMSFSNUM", true)
+                                            || model.symbols.contains("NUMSCNUM", true))
+                        ) {
+                            val old: Int = map[it.key]?.percentageItem ?: 0
+                            map[it.key]?.percentageItem = (old + pItem)
+                        }
+                    }
+                    arrayPatternAddress.forEach { str ->
+                        if (model.symbols.contains(str, true)
+                            && !model.symbols.contains("TOTAL", true)
+                            && !model.symbols.contains("CURRENCY", true)
+                        ) {
+                            val old: Int = map[it.key]?.percentageAddress ?: 0
+                            map[it.key]?.percentageAddress = (old + pAddress)
+                        }
+                    }
+                    arrayPatternReceiptNumber.forEach { str ->
+                        if (model.symbols.contains(str, true)
+                            && !model.symbols.contains("TOTAL", true)
+                            && model.symbols.contains("NUM", true)
+                            && !model.symbols.contains("CURRENCY", true)
+                            && !model.symbols.contains("SC", true)
+                        ) {
+
+                            val old: Int = map[it.key]?.percentageReceiptNumber ?: 0
+                            map[it.key]?.percentageReceiptNumber = (old + pReceiptNo)
+                        }
+                    }
+                }
+            }
+            map.forEach {
+                val model = it.value
+                Log.d("#Predicted Again: ", "" + " Size: " + model.getHigherPercentage().tagCorrected)
+            }
         }
 
-        postProcess()
     }
 
+    fun readAssetsFile() {
+        var pointer = 0
+        var data = HashMap<Int, ModelReceiptData>()
+        val arraySymbols = ArrayList<String>()
+        val inputStream: InputStream = assets.open("testtext.txt")
+        var reader: BufferedReader? = null
+        val sb = StringBuilder()
+        try {
+            reader = BufferedReader(
+                InputStreamReader(assets.open("testtext.txt"))
+            )
+
+            // do reading, usually loop until end of file reading
+            val mLine = ""
+
+            reader.readLines().forEach {
+                if (it.trim().isNotEmpty() && it != ",") {
+                    pointer += 1
+                    val symbols = getSymbolicString(it)
+                    arraySymbols.add(symbols)
+                    sb.append("$symbols, \n")
+                   // data[pointer] = ModelReceiptData(symbols = sb.toString())
+                }
+
+            }
+            //  data.put(pointer,ModelReceiptData(symbols=sb.toString()))
+            // Log.d("###LINES", "" + sb.toString().replace(",", "\n"))
+            Log.d("###LINES", "" + arraySymbols.size)
+
+        } catch (e: IOException) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close()
+                    //calculatePercentage(data)
+                } catch (e: IOException) {
+                    //log the exception
+                }
+            }
+        }
+
+
+    }
 
     private fun postProcess() {
 
@@ -606,20 +633,22 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
                 showReceiptDialog(this, object : listener.onSelectReceiptListener {
                     @RequiresApi(Build.VERSION_CODES.M)
                     override fun onRecentCameraSelected() {
-                        binding.model = Receipt()
-                        binding.notifyChange()
-                        super.onRecentCameraSelected()
-                        if (ContextCompat.checkSelfPermission(
-                                this@AddReceiptActivity, Manifest.permission.CAMERA
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            requestPermissions(
-                                arrayOf(Manifest.permission.CAMERA),
-                                PERMISSIONS_REQUEST_CAMERA
-                            )
-                        } else {
-                            getImageFromCamera()
-                        }
+                        readAssetsFile()
+
+//                        binding.model = Receipt()
+//                        binding.notifyChange()
+//                        super.onRecentCameraSelected()
+//                        if (ContextCompat.checkSelfPermission(
+//                                this@AddReceiptActivity, Manifest.permission.CAMERA
+//                            ) != PackageManager.PERMISSION_GRANTED
+//                        ) {
+//                            requestPermissions(
+//                                arrayOf(Manifest.permission.CAMERA),
+//                                PERMISSIONS_REQUEST_CAMERA
+//                            )
+//                        } else {
+//                            getImageFromCamera()
+//                        }
                     }
 
                     override fun onRecentGallerySelected() {
@@ -669,6 +698,7 @@ class AddReceiptActivity : BaseActivity(), View.OnClickListener {
             }
         }
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
